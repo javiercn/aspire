@@ -65,12 +65,12 @@
 
                             <DesktopToolbarDivider />
 
-                            <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)"><FluentIcon Value="@(new Icons.Regular.Size20.Filter())" /></FluentButton>
+                            <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)"><FluentIcon Value="@(new Octicons.Size20.Filter())" /></FluentButton>
 
                             <DesktopToolbarDivider />
 
                             <AspireMenuButton ButtonAppearance="Appearance.Lightweight"
-                                              Icon="@(new Icons.Regular.Size20.Options())"
+                                              Icon="@(new Octicons.Size20.Options())"
                                               Items="@_traceActionsMenuItems"
                                               Title="@ControlStringsLoc[nameof(ControlsStrings.ActionsButtonText)]" />
                         </div>
@@ -97,10 +97,10 @@
                         </div>
                     }
                     <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)">
-                        <FluentIcon Class="align-text-bottom" Value="@(new Icons.Regular.Size20.Filter())" /> @FilterLoc[nameof(StructuredFiltering.AddFilter)]
+                        <FluentIcon Class="align-text-bottom" Value="@(new Octicons.Size20.Filter())" /> @FilterLoc[nameof(StructuredFiltering.AddFilter)]
                     </FluentButton>
                     <AspireMenuButton ButtonAppearance="Appearance.Lightweight"
-                                      Icon="@(new Icons.Regular.Size20.Options())"
+                                      Icon="@(new Octicons.Size20.Options())"
                                       Items="@_traceActionsMenuItems"
                                       Title="@ControlStringsLoc[nameof(ControlsStrings.ActionsButtonText)]"
                                       Text="@ControlStringsLoc[nameof(ControlsStrings.ActionsButtonText)]"/>
@@ -174,7 +174,7 @@
                                                     // - 5px extra margin-left
                                                     // - 5px border
                                                     // - 9px padding-left
-                                                    spanNameContainerStyle = $"margin-left: 5px; border-left-color: {ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(context.Span.Source))}; border-left-width: 5px; border-left-style: solid; padding-left: 9px;";
+                                                    spanNameContainerStyle = $"margin-left: 5px; --resource-color: {ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(context.Span.Source))};";
                                                 }
                                                 else
                                                 {
@@ -190,11 +190,11 @@
                                                     @if (context.Children.Count > 0)
                                                     {
                                                         <FluentButton aria-label="@ControlStringsLoc[nameof(ControlsStrings.ToggleNesting)]" Appearance="Appearance.Lightweight" Class="main-grid-expand-button" OnClick="@(() => OnToggleCollapse(context))">
-                                                            <FluentIcon Icon="Icons.Regular.Size12.ChevronRight" Color="Color.Neutral" />
+                                                            <FluentIcon Icon="Octicons.Size12.ChevronRight" Color="Color.Neutral" />
                                                         </FluentButton>
                                                     }
                                                 </span>
-                                                <span class="span-name-container" style="@spanNameContainerStyle">
+                                                <span class="span-name-container @(isServerOrConsumer ? "" : "resource-pill")" style="@spanNameContainerStyle">
                                                     @if (isServerOrConsumer)
                                                     {
                                                         <FluentIcon Class="span-kind-icon"
@@ -205,7 +205,7 @@
 
                                                     @if (context.IsError)
                                                     {
-                                                        <FluentIcon Icon="Icons.Filled.Size12.ErrorCircle" Color="Color.Error" Class="trace-tag-icon"/>
+                                                        <FluentIcon Icon="Octicons.Size12.ErrorCircle" Color="Color.Error" Class="trace-tag-icon"/>
                                                     }
                                                     <FluentHighlighter HighlightedText="@PageViewModel.Filter" Text="@context.Span.GetDisplaySummary()" />
                                                     @if (context.HasUninstrumentedPeer)
@@ -215,16 +215,16 @@
                                                                 Icon icon;
                                                                 if (context.Span.Attributes.HasKey("db.system"))
                                                                 {
-                                                                    icon = new Icons.Filled.Size16.Database();
+                                                                    icon = new Octicons.Size16.Database();
                                                                 }
                                                                 else if (context.Span.Attributes.HasKey("messaging.system"))
                                                                 {
-                                                                    icon = new Icons.Filled.Size16.Mail();
+                                                                    icon = new Octicons.Size16.Mail();
                                                                 }
                                                                 else
                                                                 {
                                                                     // Everything else.
-                                                                    icon = new Icons.Filled.Size16.ArrowCircleRight();
+                                                                    icon = new Octicons.Size16.ArrowCircleRight();
                                                                 }
                                                             }
                                                             <FluentIcon
@@ -242,7 +242,7 @@
                                                                     Title="@ControlStringsLoc[nameof(ControlsStrings.GenAIDetailsTitle)]"
                                                                     Class="genai-details-button"
                                                                     OnClick="() => OnGenAIClickedAsync(context.Span)">
-                                                            <FluentIcon Icon="Icons.Regular.Size20.Sparkle"
+                                                            <FluentIcon Icon="Octicons.Size20.Sparkle"
                                                                         Color="Color.Accent" />
                                                         </FluentButton>
                                                     }
@@ -358,7 +358,7 @@
                                         </AspireTemplateColumn>
                                     </ChildContent>
                                     <EmptyContent>
-                                        <FluentIcon Icon="Icons.Regular.Size24.GanttChart" />&nbsp;@Loc[nameof(Dashboard.Resources.TraceDetail.TraceDetailNoSpans)]
+                                        <FluentIcon Icon="Octicons.Size24.GanttChart" />&nbsp;@Loc[nameof(Dashboard.Resources.TraceDetail.TraceDetailNoSpans)]
                                     </EmptyContent>
                                 </FluentDataGrid>
                             </GridColumnManager>
@@ -381,7 +381,7 @@
     else
     {
         <div class="empty-content">
-            <FluentIcon Icon="Icons.Regular.Size24.GanttChart" /> &nbsp; @string.Format(Loc[nameof(Dashboard.Resources.TraceDetail.TraceDetailTraceNotFound)], TraceId)
+            <FluentIcon Icon="Octicons.Size24.GanttChart" /> &nbsp; @string.Format(Loc[nameof(Dashboard.Resources.TraceDetail.TraceDetailTraceNotFound)], TraceId)
         </div>
     }
 </div>

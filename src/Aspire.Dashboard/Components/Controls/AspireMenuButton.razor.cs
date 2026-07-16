@@ -2,16 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Model;
+using Aspire.Dashboard.Components.CustomIcons;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components;
 
 public partial class AspireMenuButton : FluentComponentBase
 {
-    private static readonly Icon s_defaultIcon = new Icons.Regular.Size24.ChevronDown();
+    private static readonly Icon s_defaultIcon = new Octicons.Size24.ChevronDown();
 
     private bool _visible;
     private Icon? _icon;

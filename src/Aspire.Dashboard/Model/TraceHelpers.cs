@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Runtime.InteropServices;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Otlp.Model;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -110,20 +110,20 @@ public static class TraceHelpers
         }
     }
 
-    private static readonly Icon s_serverFilled = new Icons.Filled.Size16.Server();
-    private static readonly Icon s_serverRegular = new Icons.Regular.Size16.Server();
+    private static readonly Icon s_serverFilled = new Octicons.Size16.Server();
+    private static readonly Icon s_serverRegular = new Octicons.Size16.Server();
 
-    private static readonly Icon s_mailboxFilled = new Icons.Filled.Size16.Mailbox();
-    private static readonly Icon s_mailboxRegular = new Icons.Regular.Size16.Mailbox();
+    private static readonly Icon s_mailboxFilled = new Octicons.Size16.Mailbox();
+    private static readonly Icon s_mailboxRegular = new Octicons.Size16.Mailbox();
 
-    private static readonly Icon s_contentSettingsFilled = new Icons.Filled.Size16.ContentSettings();
-    private static readonly Icon s_contentSettingsRegular = new Icons.Regular.Size16.ContentSettings();
+    private static readonly Icon s_contentSettingsFilled = new Octicons.Size16.ContentSettings();
+    private static readonly Icon s_contentSettingsRegular = new Octicons.Size16.ContentSettings();
 
-    private static readonly Icon s_mailFilled = new Icons.Filled.Size16.Mail();
-    private static readonly Icon s_mailRegular = new Icons.Regular.Size16.Mail();
+    private static readonly Icon s_mailFilled = new Octicons.Size16.Mail();
+    private static readonly Icon s_mailRegular = new Octicons.Size16.Mail();
 
-    private static readonly Icon s_boxFilled = new Icons.Filled.Size16.Box();
-    private static readonly Icon s_boxRegular = new Icons.Regular.Size16.Box();
+    private static readonly Icon s_boxFilled = new Octicons.Size16.Box();
+    private static readonly Icon s_boxRegular = new Octicons.Size16.Box();
 
     public static Icon? TryGetSpanIcon(OtlpSpan span, IconVariant iconVariant)
     {

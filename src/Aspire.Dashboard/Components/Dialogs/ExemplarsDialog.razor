@@ -13,7 +13,7 @@
                     TGridItem="ChartExemplar">
         <ChildContent>
             <TemplateColumn Title="@Loc[nameof(Dialogs.ExemplarsDialogTraceColumnHeader)]" TooltipText="@(context => GetTitle(context))" Tooltip="true">
-                <span style="padding-left:5px; border-left-width: 5px; border-left-style: solid; border-left-color: @(context.Span != null ? ColorGenerator.Instance.GetColorVariableByKey(OtlpResource.GetResourceName(context.Span.Source, Content.Resources)) : "transparent");">
+                <span class="resource-pill" style="--resource-color: @(context.Span != null ? ColorGenerator.Instance.GetColorVariableByKey(OtlpResource.GetResourceName(context.Span.Source, Content.Resources)) : "transparent");">
                     @GetTitle(context)
                 </span>
             </TemplateColumn>
@@ -28,7 +28,7 @@
             </TemplateColumn>
         </ChildContent>
         <EmptyContent>
-            <FluentIcon Icon="Icons.Regular.Size24.ChartMultiple" />&nbsp;@Loc[nameof(ControlsStrings.MetricTableNoMetricsFound)]
+            <FluentIcon Icon="Octicons.Size24.ChartMultiple" />&nbsp;@Loc[nameof(ControlsStrings.MetricTableNoMetricsFound)]
         </EmptyContent>
     </FluentDataGrid>
 </div>

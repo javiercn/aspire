@@ -75,12 +75,12 @@
 
             @if (ViewportInformation.IsDesktop)
             {
-                <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)"><FluentIcon Value="@(new Icons.Regular.Size20.Filter())" /></FluentButton>
+                <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)"><FluentIcon Value="@(new Octicons.Size20.Filter())" /></FluentButton>
             }
             else
             {
                 <FluentButton slot="end" Appearance="Appearance.Stealth" aria-label="@FilterLoc[nameof(StructuredFiltering.AddFilter)]" OnClick="() => OpenFilterAsync(null)">
-                    <FluentIcon Class="align-text-bottom" Value="@(new Icons.Regular.Size20.Filter())" /> @FilterLoc[nameof(StructuredFiltering.AddFilter)]
+                    <FluentIcon Class="align-text-bottom" Value="@(new Octicons.Size20.Filter())" /> @FilterLoc[nameof(StructuredFiltering.AddFilter)]
                 </FluentButton>
             }
         </ToolbarSection>
@@ -113,7 +113,7 @@
                             <AspireTemplateColumn ColumnId="@NameColumn" ColumnManager="@_manager" Title="@ControlsStringsLoc[nameof(ControlsStrings.NameColumnHeader)]" Tooltip="true" TooltipText="@(trace => GetNameTooltip(trace))" Class="no-ellipsis">
                                 <div class="trace-name-container">
                                     <span class="trace-name-content">
-                                        <span style="padding-left:5px; border-left-width: 5px; border-left-style: solid; border-left-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName((context.RootOrFirstSpan).Source)));">
+                                        <span class="resource-pill" style="--resource-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName((context.RootOrFirstSpan).Source)));">
                                             <FluentHighlighter HighlightedText="@(TracesViewModel.FilterText)" Text="@(context.FullName)" />
                                         </span>
                                         <span class="trace-id">@OtlpHelpers.ToShortenedId(context.TraceId)</span>
@@ -124,7 +124,7 @@
                                             <FluentButton Appearance="Appearance.Lightweight"
                                                           Title="@ControlsStringsLoc[nameof(ControlsStrings.GenAIDetailsTitle)]"
                                                           OnClick="() => OnGenAIClickedAsync(context)">
-                                                <FluentIcon Icon="Icons.Regular.Size20.Sparkle"
+                                                <FluentIcon Icon="Octicons.Size20.Sparkle"
                                                             Color="Color.Accent" />
                                             </FluentButton>
                                         }
@@ -137,10 +137,10 @@
                                         @foreach (var item in TraceHelpers.GetOrderedResources(context))
                                         {
                                             <FluentOverflowItem>
-                                                <span class="trace-tag trace-service-tag" title="@(GetSpansTooltip(item))" style="border-left-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(item.Resource)));">
+                                                <span class="trace-tag trace-service-tag resource-pill" title="@(GetSpansTooltip(item))" style="--resource-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(item.Resource)));">
                                                     @if (item.ErroredSpans > 0)
                                                     {
-                                                        <FluentIcon Icon="Icons.Filled.Size12.ErrorCircle" Color="Color.Error" Class="trace-tag-icon" />
+                                                        <FluentIcon Icon="Octicons.Size12.ErrorCircle" Color="Color.Error" Class="trace-tag-icon" />
                                                     }
                                                     @GetResourceName(item.Resource) (@item.TotalSpans)
                                                 </span>
@@ -197,7 +197,7 @@
                             </AspireTemplateColumn>
                         </ChildContent>
                         <EmptyContent>
-                            <FluentIcon Icon="Icons.Regular.Size24.GanttChart" />&nbsp;@Loc[nameof(Dashboard.Resources.Traces.TracesNoTraces)]
+                            <FluentIcon Icon="Octicons.Size24.GanttChart" />&nbsp;@Loc[nameof(Dashboard.Resources.Traces.TracesNoTraces)]
                         </EmptyContent>
                     </FluentDataGrid>
                 </GridColumnManager>

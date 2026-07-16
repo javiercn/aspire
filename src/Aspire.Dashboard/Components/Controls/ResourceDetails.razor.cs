@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Concurrent;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Diagnostics;
 using Aspire.Dashboard.Components.Controls.PropertyValues;
 using Aspire.Dashboard.Components.Pages;
@@ -16,7 +17,6 @@ using Humanizer;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Controls;
 
@@ -271,7 +271,7 @@ public partial class ResourceDetails : IComponentWithTelemetry, IDisposable
             _resourceActionsMenuItems.Add(new MenuButtonItem
             {
                 Text = _showAll ? ControlStringsLoc[nameof(ControlsStrings.EnvironmentVariablesFilterToggleShowSpecOnly)] : ControlStringsLoc[nameof(ControlsStrings.EnvironmentVariablesFilterToggleShowAll)],
-                Icon = _showAll ? new Icons.Regular.Size16.DocumentHeader() : new Icons.Regular.Size16.DocumentOnePage(),
+                Icon = _showAll ? new Octicons.Size16.DocumentHeader() : new Octicons.Size16.DocumentOnePage(),
                 OnClick = () =>
                 {
                     _showAll = !_showAll;
@@ -286,7 +286,7 @@ public partial class ResourceDetails : IComponentWithTelemetry, IDisposable
         _resourceActionsMenuItems.Add(new MenuButtonItem
         {
             Text = IsMaskAllChecked ? ControlStringsLoc[nameof(ControlsStrings.EnvironmentVariablesShowVariableValues)] : ControlStringsLoc[nameof(ControlsStrings.EnvironmentVariablesHideVariableValues)],
-            Icon = IsMaskAllChecked ? new Icons.Regular.Size16.Eye() : new Icons.Regular.Size16.EyeOff(),
+            Icon = IsMaskAllChecked ? new Octicons.Size16.Eye() : new Octicons.Size16.EyeOff(),
             OnClick = () =>
             {
                 IsMaskAllChecked = !IsMaskAllChecked;

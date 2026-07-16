@@ -2,13 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Components.Dialogs;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Otlp.Storage;
 using Aspire.Dashboard.Resources;
 using Aspire.Dashboard.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -17,16 +17,16 @@ namespace Aspire.Dashboard.Model;
 /// </summary>
 public sealed class ResourceMenuBuilder
 {
-    private static readonly Icon s_viewDetailsIcon = new Icons.Regular.Size16.Info();
-    private static readonly Icon s_consoleLogsIcon = new Icons.Regular.Size16.SlideText();
-    private static readonly Icon s_structuredLogsIcon = new Icons.Regular.Size16.SlideTextSparkle();
-    private static readonly Icon s_tracesIcon = new Icons.Regular.Size16.GanttChart();
-    private static readonly Icon s_metricsIcon = new Icons.Regular.Size16.ChartMultiple();
-    private static readonly Icon s_linkIcon = new Icons.Regular.Size16.Link();
-    private static readonly Icon s_toolboxIcon = new Icons.Regular.Size16.Toolbox();
-    private static readonly Icon s_linkMultipleIcon = new Icons.Regular.Size16.LinkMultiple();
-    private static readonly Icon s_bracesIcon = new Icons.Regular.Size16.Braces();
-    private static readonly Icon s_exportEnvIcon = new Icons.Regular.Size16.DocumentText();
+    private static readonly Icon s_viewDetailsIcon = new Octicons.Size16.Info();
+    private static readonly Icon s_consoleLogsIcon = new Octicons.Size16.SlideText();
+    private static readonly Icon s_structuredLogsIcon = new Octicons.Size16.SlideTextSparkle();
+    private static readonly Icon s_tracesIcon = new Octicons.Size16.GanttChart();
+    private static readonly Icon s_metricsIcon = new Octicons.Size16.ChartMultiple();
+    private static readonly Icon s_linkIcon = new Octicons.Size16.Link();
+    private static readonly Icon s_toolboxIcon = new Octicons.Size16.Toolbox();
+    private static readonly Icon s_linkMultipleIcon = new Octicons.Size16.LinkMultiple();
+    private static readonly Icon s_bracesIcon = new Octicons.Size16.Braces();
+    private static readonly Icon s_exportEnvIcon = new Octicons.Size16.DocumentText();
 
     private readonly NavigationManager _navigationManager;
     private readonly TelemetryRepository _telemetryRepository;

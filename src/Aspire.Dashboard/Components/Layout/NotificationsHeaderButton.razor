@@ -1,5 +1,4 @@
-﻿@using Aspire.Dashboard.Resources
-
+@using Aspire.Dashboard.Resources
 @if (UnreadCount > 0)
 {
     <FluentButton Class="header-button"
@@ -13,7 +12,7 @@
                             Appearance="Appearance.Accent"
                             Style="border: 0;">
             <ChildContent>
-                <FluentIcon Value="@(new Icons.Regular.Size24.Alert())" Color="Color.Neutral" Style="vertical-align: bottom;" />
+                <FluentIcon Value="@(new Octicons.Size24.Alert())" Color="Color.Neutral" Style="vertical-align: bottom;" />
             </ChildContent>
         </FluentCounterBadge>
     </FluentButton>
@@ -23,6 +22,6 @@ else
     <FluentButton Class="header-button"
                   Appearance="Appearance.Stealth" OnClick="@HandleClick"
                   Title="@Loc[nameof(Layout.MainLayoutLaunchNotifications)]" aria-label="@Loc[nameof(Layout.MainLayoutLaunchNotifications)]">
-        <FluentIcon Value="@(new Icons.Regular.Size24.Alert())" Color="Color.Neutral" />
+        <FluentIcon Value="@(new Octicons.Size24.Alert())" Color="Color.Neutral" />
     </FluentButton>
 }

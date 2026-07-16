@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.ObjectModel;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Diagnostics;
 using System.Net;
 using Aspire.Dashboard.Components.Dialogs;
@@ -203,23 +204,23 @@ public class InteractionsProvider : ComponentBase, IAsyncDisposable
                             break;
                         case MessageIntentDto.Success:
                             content.IconColor = Color.Success;
-                            content.Icon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size24.CheckmarkCircle();
+                            content.Icon = new Octicons.Size24.CheckmarkCircle();
                             break;
                         case MessageIntentDto.Warning:
                             content.IconColor = Color.Warning;
-                            content.Icon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size24.Warning();
+                            content.Icon = new Octicons.Size24.Warning();
                             break;
                         case MessageIntentDto.Error:
                             content.IconColor = Color.Error;
-                            content.Icon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size24.DismissCircle();
+                            content.Icon = new Octicons.Size24.DismissCircle();
                             break;
                         case MessageIntentDto.Information:
                             content.IconColor = Color.Info;
-                            content.Icon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size24.Info();
+                            content.Icon = new Octicons.Size24.Info();
                             break;
                         case MessageIntentDto.Confirmation:
                             content.IconColor = Color.Success;
-                            content.Icon = new Microsoft.FluentUI.AspNetCore.Components.Icons.Filled.Size24.QuestionCircle();
+                            content.Icon = new Octicons.Size24.QuestionCircle();
                             break;
                     }
 

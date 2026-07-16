@@ -1,4 +1,4 @@
-﻿@using Aspire.Dashboard.Components.CustomIcons
+
 @using Aspire.Dashboard.Components.Interactions
 @using Aspire.Dashboard.Resources
 @inject IStringLocalizer<Dialogs> DialogsLoc
@@ -30,14 +30,14 @@
                           Id="@HelpButtonId"
                           Appearance="Appearance.Stealth" OnClick="@(() => LaunchHelpAsync(HelpButtonId))"
                           Title="@Loc[nameof(Layout.MainLayoutAspireDashboardHelpLink)]" aria-label="@Loc[nameof(Layout.MainLayoutAspireDashboardHelpLink)]">
-                <FluentIcon Value="@(new Icons.Regular.Size24.QuestionCircle())" Color="Color.Neutral"/>
+                <FluentIcon Value="@(new Octicons.Size24.QuestionCircle())" Color="Color.Neutral"/>
             </FluentButton>
             @if (Options.CurrentValue.UI.DisableAgentHelp != true)
             {
                 <FluentButton Class="header-button"
                               Appearance="Appearance.Stealth" OnClick="@LaunchAIAgentsAsync"
                               Title="@Loc[nameof(Layout.MainLayoutLaunchAIAgents)]" aria-label="@Loc[nameof(Layout.MainLayoutLaunchAIAgents)]">
-                    <FluentIcon Value="@(new Icons.Regular.Size24.BotSparkle())" Color="Color.Neutral"/>
+                    <FluentIcon Value="@(new Octicons.Size24.BotSparkle())" Color="Color.Neutral"/>
                 </FluentButton>
             }
             <NotificationsHeaderButton OnClick="@LaunchNotificationsAsync" />
@@ -45,7 +45,7 @@
                           Id="@SettingsButtonId"
                           Appearance="Appearance.Stealth" OnClick="@(() => LaunchSettingsAsync(SettingsButtonId))"
                           Title="@Loc[nameof(Layout.MainLayoutLaunchSettings)]" aria-label="@Loc[nameof(Layout.MainLayoutLaunchSettings)]">
-                <FluentIcon Value="@(new Icons.Regular.Size24.Settings())" Color="Color.Neutral"/>
+                <FluentIcon Value="@(new Octicons.Size24.Settings())" Color="Color.Neutral"/>
             </FluentButton>
             <UserProfile/>
         </FluentHeader>
@@ -62,7 +62,7 @@
 
             <UserProfile/>
             <FluentButton
-                IconEnd="@(_isNavMenuOpen ? new Icons.Regular.Size24.Dismiss() : new Icons.Regular.Size24.Navigation())"
+                IconEnd="@(_isNavMenuOpen ? new Octicons.Size24.Dismiss() : new Octicons.Size24.Navigation())"
                 Id="@NavigationButtonId"
                 Title="@(DialogsLoc[nameof(Dialogs.HelpDialogCategoryNavigation)])"
                 Appearance="Appearance.Stealth"

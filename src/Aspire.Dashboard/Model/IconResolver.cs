@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Concurrent;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -16,10 +16,10 @@ public sealed class IconResolver
     private readonly ILogger<IconResolver> _logger;
 
     // Fallback icon when a command specifies an icon name that can't be resolved to a FluentUI icon.
-    private static readonly Icon s_unknownCommandIcon = new Icons.Regular.Size16.QuestionCircle();
+    private static readonly Icon s_unknownCommandIcon = new Octicons.Size16.QuestionCircle();
 
     // Default icon for highlighted commands that don't specify any icon name.
-    private static readonly Icon s_defaultHighlightedCommandIcon = new Icons.Regular.Size16.Flash();
+    private static readonly Icon s_defaultHighlightedCommandIcon = new Octicons.Size16.Flash();
 
     public IconResolver(ILogger<IconResolver> logger)
     {

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Globalization;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Components.Dialogs;
 using Aspire.Dashboard.Telemetry;
 using Aspire.Dashboard.Utils;
@@ -9,7 +10,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
 using FluentMessageIntent = Microsoft.FluentUI.AspNetCore.Components.MessageIntent;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -318,15 +318,15 @@ public sealed class DashboardCommandExecutor(
     {
         return intent switch
         {
-            ToastIntent.Success => (new Icons.Filled.Size24.CheckmarkCircle(), Color.Success),
-            ToastIntent.Warning => (new Icons.Filled.Size24.Warning(), Color.Warning),
-            ToastIntent.Error => (new Icons.Filled.Size24.DismissCircle(), Color.Error),
-            ToastIntent.Info => (new Icons.Filled.Size24.Info(), Color.Info),
-            ToastIntent.Progress => (new Icons.Regular.Size24.Flash(), Color.Neutral),
-            ToastIntent.Upload => (new Icons.Regular.Size24.ArrowUpload(), Color.Neutral),
-            ToastIntent.Download => (new Icons.Regular.Size24.ArrowDownload(), Color.Neutral),
-            ToastIntent.Event => (new Icons.Regular.Size24.CalendarLtr(), Color.Neutral),
-            ToastIntent.Mention => (new Icons.Regular.Size24.Person(), Color.Neutral),
+            ToastIntent.Success => (new Octicons.Size24.CheckmarkCircle(), Color.Success),
+            ToastIntent.Warning => (new Octicons.Size24.Warning(), Color.Warning),
+            ToastIntent.Error => (new Octicons.Size24.DismissCircle(), Color.Error),
+            ToastIntent.Info => (new Octicons.Size24.Info(), Color.Info),
+            ToastIntent.Progress => (new Octicons.Size24.Flash(), Color.Neutral),
+            ToastIntent.Upload => (new Octicons.Size24.ArrowUpload(), Color.Neutral),
+            ToastIntent.Download => (new Octicons.Size24.ArrowDownload(), Color.Neutral),
+            ToastIntent.Event => (new Octicons.Size24.CalendarLtr(), Color.Neutral),
+            ToastIntent.Mention => (new Octicons.Size24.Person(), Color.Neutral),
             ToastIntent.Custom => null,
             _ => throw new InvalidOperationException()
         };

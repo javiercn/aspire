@@ -79,11 +79,11 @@
                           OnClick="() => OpenFilterAsync(null)">
                 @if (ViewportInformation.IsDesktop)
                 {
-                    <FluentIcon Value="@(new Icons.Regular.Size20.Filter())"/>
+                    <FluentIcon Value="@(new Octicons.Size20.Filter())"/>
                 }
                 else
                 {
-                    <FluentIcon Class="align-text-bottom" Value="@(new Icons.Regular.Size20.Filter())"/>
+                    <FluentIcon Class="align-text-bottom" Value="@(new Octicons.Size20.Filter())"/>
                     @FilterLoc[nameof(StructuredFiltering.AddFilter)]
                 }
             </FluentButton>
@@ -131,7 +131,7 @@
                                                 Class="main-grid enable-row-click">
                                     <ChildContent>
                                         <AspireTemplateColumn ColumnId="@ResourceColumn" ColumnManager="@_manager" Title="@Loc[nameof(Dashboard.Resources.StructuredLogs.StructuredLogsResourceColumnHeader)]" Tooltip="true" TooltipText="@(e => GetResourceName(e.ResourceView))">
-                                            <span style="padding-left:5px; border-left-width: 5px; border-left-style: solid; border-left-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(context.ResourceView)));">
+                                            <span class="resource-pill" style="--resource-color: @(ColorGenerator.Instance.GetColorVariableByKey(GetResourceName(context.ResourceView)));">
                                                 @GetResourceName(context.ResourceView)
                                             </span>
                                         </AspireTemplateColumn>
@@ -168,7 +168,7 @@
                                         </AspireTemplateColumn>
                                     </ChildContent>
                                     <EmptyContent>
-                                        <FluentIcon Icon="Icons.Regular.Size24.SlideTextSparkle" />&nbsp;@Loc[nameof(Dashboard.Resources.StructuredLogs.StructuredLogsNoLogsFound)]
+                                        <FluentIcon Icon="Octicons.Size24.SlideTextSparkle" />&nbsp;@Loc[nameof(Dashboard.Resources.StructuredLogs.StructuredLogsNoLogsFound)]
                                     </EmptyContent>
                                 </FluentDataGrid>
                             </GridColumnManager>

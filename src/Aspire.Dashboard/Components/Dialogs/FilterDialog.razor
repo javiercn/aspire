@@ -60,7 +60,7 @@
                                     Placeholder="@Loc[nameof(Dialogs.FilterDialogDatePlaceholder)]"
                                     Label="@Loc[nameof(Dialogs.FilterDialogDateValueLabel)]">
                         <FluentIcon slot="end"
-                                    Value="@(new Icons.Regular.Size16.Calendar())"
+                                    Value="@(new Octicons.Size16.Calendar())"
                                     Title="@Loc[nameof(Dialogs.FilterDialogPickDateButtonTitle)]"
                                     OnClick="OpenDatePickerAsync"
                                     Style="cursor: pointer;" />
@@ -114,9 +114,9 @@
                     }
                     else
                     {
-                        <FluentButton Appearance="Appearance.Stealth" Title="@Loc[nameof(Dialogs.FilterDialogDisableFilterButtonText)]" aria-label="@Loc[nameof(Dialogs.FilterDialogDisableFilterButtonText)]" OnClick="Enable"><FluentIcon Value="@(new Icons.Regular.Size16.Play())" /></FluentButton>
+                        <FluentButton Appearance="Appearance.Stealth" Title="@Loc[nameof(Dialogs.FilterDialogDisableFilterButtonText)]" aria-label="@Loc[nameof(Dialogs.FilterDialogDisableFilterButtonText)]" OnClick="Enable"><FluentIcon Value="@(new Octicons.Size16.Play())" /></FluentButton>
                     }
-                    <FluentButton Appearance="Appearance.Stealth" Title="@Loc[nameof(Dialogs.FilterDialogRemoveFilterButtonText)]" aria-label="@Loc[nameof(Dialogs.FilterDialogRemoveFilterButtonText)]" OnClick="Delete"><FluentIcon Value="@(new Icons.Regular.Size16.Delete())" /></FluentButton>
+                    <FluentButton Appearance="Appearance.Stealth" Title="@Loc[nameof(Dialogs.FilterDialogRemoveFilterButtonText)]" aria-label="@Loc[nameof(Dialogs.FilterDialogRemoveFilterButtonText)]" OnClick="Delete"><FluentIcon Value="@(new Octicons.Size16.Delete())" /></FluentButton>
                 }
             </FluentStack>
 

@@ -1,0 +1,327 @@
+/*
+    GitHub (Primer) look-and-feel overlay for the Aspire Dashboard.
+
+    The bulk of the redesign is driven by reseeding the Fluent (FAST) adaptive design tokens in
+    js/app-theme.js (accent, neutral tint, corner radius, font, dark luminance), which regenerates
+    all --neutral-*/--accent-* tokens. This sheet only remaps the small set of *hardcoded* custom
+    variables in app.css that the Fluent pipeline does not generate, plus a few control nudges so
+    things like the data grid feel like GitHub. Keep it small and semantic: prefer remapping a
+    variable over targeting a component.
+*/
+
+:root {
+    --gh-fg-muted: #59636e;
+    --gh-border-muted: #d1d9e0b3;
+    --gh-overlay-bg: #ffffff;
+    --gh-overlay-border: #d1d9e080;
+    --gh-canvas-muted: #f6f8fa;
+
+    /* Repoint app.css hardcoded customs at Primer values. */
+    --foreground-subtext-rest: var(--gh-fg-muted);
+    --foreground-subtext-hover: #6c757d;
+    --dialog-background-color: var(--gh-overlay-bg);
+    --dialog-border-color: var(--gh-overlay-border);
+    --table-body-border-color: var(--gh-border-muted);
+    --scrollbar-color: #d1d9e0;
+    --property-grid-background-color: var(--gh-canvas-muted);
+    --property-grid-genai-dialog-background-color: var(--gh-canvas-muted);
+}
+
+[data-theme="dark"] {
+    --gh-fg-muted: #9198a1;
+    --gh-border-muted: #3d444db3;
+    --gh-overlay-bg: #151b23;
+    --gh-overlay-border: #3d444db3;
+    --gh-canvas-muted: #151b23;
+
+    --foreground-subtext-rest: var(--gh-fg-muted);
+    --foreground-subtext-hover: #b1b8c1;
+    --dialog-background-color: var(--gh-overlay-bg);
+    --dialog-border-color: var(--gh-overlay-border);
+    --table-body-border-color: var(--gh-border-muted);
+    --scrollbar-color: #3d444d;
+    --property-grid-background-color: var(--gh-canvas-muted);
+    --property-grid-genai-dialog-background-color: #0d1117;
+}
+
+/*
+    Data grid: GitHub tables use quiet, muted column headers and only horizontal row dividers,
+    with no persistent vertical column separators. Fluent already draws horizontal borders via
+    --neutral-stroke-divider-rest (auto-tinted by the reseed). The only always-on vertical marks
+    are the column resize handles, so hide them until the header is hovered, and mute the header
+    label so it reads like a Primer table head.
+*/
+.fluent-data-grid {
+    /*
+        GitHub tables read clean with no persistent vertical column separators. Fluent draws an
+        always-on 1px column resize tick (border-inline-end on .resize-handle, colored via this var
+        from the scoped component bundle which loads after this sheet, so !important is required to
+        win the tie). Hide it by default and reveal the resize affordance only on header hover.
+    */
+    --fluent-data-grid-resize-handle-color: transparent !important;
+}
+
+.fluent-data-grid th:hover {
+    --fluent-data-grid-resize-handle-color: var(--neutral-stroke-rest) !important;
+}
+
+.fluent-data-grid .column-header {
+    color: var(--gh-fg-muted);
+    font-weight: 600;
+}
+
+/*
+    Typography: GitHub/Primer uses Mona Sans for display text (titles) over the system UI stack.
+    Ship the OFL-licensed Mona Sans variable font and apply it to page/section headings only,
+    keeping the system stack (set via the Fluent bodyFont token) for dense UI/table text so
+    rendering stays crisp and payload stays small. License: wwwroot/fonts/Mona-Sans-OFL.txt.
+*/
+@font-face {
+    font-family: "Mona Sans";
+    src: url("../fonts/MonaSansVF.woff2") format("woff2");
+    font-weight: 200 900;
+    font-display: swap;
+    font-style: normal;
+}
+
+h1, h2, h3,
+.page-header h1,
+.fluent-appbar .brand-name,
+.app-title {
+    font-family: "Mona Sans", var(--body-font);
+    font-weight: 600;
+    /* Primer titles use a slightly tighter tracking. */
+    letter-spacing: -0.01em;
+}
+
+/*
+    Primer label palette (text + light background per hue), captured from the GitHub Copilot app.
+    Used to render status/level cells as Primer-style labels. Kept as variables so the same hues
+    can be reused and tweaked in one place.
+*/
+:root {
+    --gh-label-red-fg: #c50d28;
+    --gh-label-red-bg: #ffe0e3;
+    --gh-label-orange-fg: #a24610;
+    --gh-label-orange-bg: #ffe7d1;
+    --gh-label-yellow-fg: #805900;
+    --gh-label-yellow-bg: #f7eea1;
+    --gh-label-green-fg: #2b6e3f;
+    --gh-label-green-bg: #caf7ca;
+    --gh-label-blue-fg: #005fcc;
+    --gh-label-blue-bg: #d1f0ff;
+    --gh-label-gray-fg: #5c6570;
+    --gh-label-gray-bg: #e8ecf2;
+}
+
+[data-theme="dark"] {
+    --gh-label-red-fg: #ff9592;
+    --gh-label-red-bg: #33121a;
+    --gh-label-orange-fg: #f0883e;
+    --gh-label-orange-bg: #3a1e10;
+    --gh-label-yellow-fg: #d4a72c;
+    --gh-label-yellow-bg: #2e2a10;
+    --gh-label-green-fg: #57ab5a;
+    --gh-label-green-bg: #13241a;
+    --gh-label-blue-fg: #6cb6ff;
+    --gh-label-blue-bg: #10243e;
+    --gh-label-gray-fg: #9198a1;
+    --gh-label-gray-bg: #21262d;
+}
+
+/*
+    Structured logs: color the Level cell text by severity like a Primer label. The log level is
+    exposed as a class on the row/cell (log-row-error / -warning / -critical / -debug / -trace),
+    and Level is the 2nd grid column, so we can style it in pure CSS without changing markup.
+*/
+.fluent-data-grid-row.log-row-error td[col-index="2"],
+.fluent-data-grid-row.log-row-critical td[col-index="2"] {
+    color: var(--gh-label-red-fg);
+    font-weight: 600;
+}
+
+.fluent-data-grid-row.log-row-warning td[col-index="2"] {
+    color: var(--gh-label-yellow-fg);
+    font-weight: 600;
+}
+
+.fluent-data-grid-row.log-row-debug td[col-index="2"],
+.fluent-data-grid-row.log-row-trace td[col-index="2"] {
+    color: var(--gh-fg-muted);
+}
+
+/*
+    Resources: render the State cell as a Primer-style label. The .state-column-cell element wraps
+    the severity icon + text, so we can pill it in pure CSS. The icon keeps its semantic color
+    (success/warning/error); the pill itself uses a neutral Primer label background.
+*/
+.state-column-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 1px 8px 1px 6px;
+    border-radius: 999px;
+    background: var(--gh-label-gray-bg);
+    color: var(--neutral-foreground-rest);
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+}
+
+/*
+    Resource identity as a Primer-style label pill. The resource's assigned color is passed in as the
+    --resource-color custom property (replacing the old colored left bar). Foreground/background are
+    mixed against the current theme's neutral tokens so contrast stays readable in light and dark
+    regardless of which of the ~20 resource colors is used. Markup is unchanged (same span).
+*/
+.resource-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    max-width: 100%;
+    padding: 0 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: color-mix(in srgb, var(--resource-color) 18%, var(--neutral-layer-1));
+    /* Mix the text halfway to the theme foreground so even light resource colors (e.g. marigold)
+       stay readable on the tinted background. */
+    color: color-mix(in srgb, var(--resource-color) 45%, var(--neutral-foreground-rest));
+    border: 1px solid color-mix(in srgb, var(--resource-color) 45%, transparent);
+}
+
+/* The traces "Spans" tags reuse .trace-tag scoped styles (border/bg) that load after this sheet,
+   so override them to render the resource pill. */
+.trace-service-tag.resource-pill {
+    border: 1px solid color-mix(in srgb, var(--resource-color) 45%, transparent) !important;
+    border-left-width: 1px !important;
+    padding: 0 8px !important;
+    border-radius: 999px !important;
+    background: color-mix(in srgb, var(--resource-color) 18%, var(--neutral-layer-1)) !important;
+    color: color-mix(in srgb, var(--resource-color) 45%, var(--neutral-foreground-rest)) !important;
+}
+
+/*
+    Text inputs: GitHub inputs are a full 1px box with a rounded corner and a focus ring, not the
+    Fluent bottom "underline". Restyle the Fluent field shadow parts (search/text/number) to match.
+*/
+fluent-search::part(root),
+fluent-text-field::part(root),
+fluent-number-field::part(root),
+fluent-select::part(control) {
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 6px;
+}
+
+fluent-search:hover::part(root),
+fluent-text-field:hover::part(root),
+fluent-number-field:hover::part(root),
+fluent-select:hover::part(control) {
+    border-color: var(--neutral-stroke-hover);
+}
+
+fluent-search:focus-within::part(root),
+fluent-text-field:focus-within::part(root),
+fluent-number-field:focus-within::part(root),
+fluent-select:focus-within::part(control) {
+    border-color: var(--accent-fill-rest);
+    box-shadow: 0 0 0 1px var(--accent-fill-rest);
+    outline: none;
+}
+
+/*
+    Tabs: render the page tabs as a Primer segmented control (rounded track with a pill-shaped
+    selected tab and a subtle shadow) instead of the Fluent blue underline indicator.
+*/
+fluent-tabs::part(tablist) {
+    background: var(--neutral-layer-2);
+    border: 1px solid var(--neutral-stroke-rest);
+    border-radius: 8px;
+    padding: 3px;
+    gap: 2px;
+}
+
+fluent-tabs::part(activeIndicator) {
+    display: none !important;
+}
+
+fluent-tab {
+    border-radius: 6px;
+    color: var(--neutral-foreground-rest);
+}
+
+fluent-tab:hover {
+    background: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
+}
+
+fluent-tab[aria-selected="true"] {
+    background: var(--neutral-layer-1);
+    box-shadow: 0 1px 1px 0 #1f23280a, 0 1px 2px 0 #1f232808;
+}
+
+/* In a segmented control the selected tab reads with the default foreground, not the accent. */
+fluent-tab[aria-selected="true"] svg {
+    fill: var(--neutral-foreground-rest) !important;
+}
+
+/*
+    Metrics meter tree: give it a Primer NavList feel with rounded hover/selected rows and slightly
+    stronger group (top-level) labels.
+*/
+.metrics-tree fluent-tree-item::part(positioning-region) {
+    border-radius: 6px;
+}
+
+.metrics-tree fluent-tree-item:hover::part(positioning-region) {
+    background: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
+}
+
+.metrics-tree > fluent-tree-item > .treeitem-text {
+    font-weight: 600;
+}
+
+/*
+    Interaction idioms to match GitHub: links underline on hover (they are underline-none at rest),
+    and interactive controls show a consistent 2px accent focus ring on keyboard focus.
+*/
+.fluent-data-grid-row a:hover,
+a.fluent-anchor:hover,
+.link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+fluent-button:focus-visible::part(control),
+fluent-anchor:focus-visible::part(control),
+fluent-tab:focus-visible,
+.fluent-data-grid-row:focus-visible {
+    outline: 2px solid var(--accent-fill-rest);
+    outline-offset: -1px;
+    border-radius: 6px;
+}
+
+/*
+    NavList: give the left navigation a Primer feel. Selected item gets a subtle rounded highlight
+    with the accent, and hover gets a quiet rounded background. Markup is unchanged.
+*/
+.fluent-appbar-item .fluentui-counterbadge-container > a {
+    border-radius: var(--gh-nav-radius, 6px);
+    transition: background-color 0.12s var(--gh-ease, ease);
+}
+
+.fluent-appbar-item .fluentui-counterbadge-container > a:hover {
+    background-color: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
+}
+
+.fluent-appbar-item .fluentui-counterbadge-container > a.active {
+    background-color: var(--accent-fill-rest);
+    background-color: color-mix(in srgb, var(--accent-fill-rest) 12%, transparent);
+}
+
+.fluent-appbar-item .fluentui-counterbadge-container > a.active [part="label"] {
+    font-weight: 600;
+    color: var(--accent-foreground-rest);
+}

@@ -31,7 +31,7 @@
                           slot="end" />
             <FluentDivider slot="end" Role="DividerRole.Presentation" Orientation="Orientation.Vertical" />
             <AspireMenuButton ButtonAppearance="Appearance.Lightweight"
-                              Icon="@(new Icons.Regular.Size20.Options())"
+                              Icon="@(new Octicons.Size20.Options())"
                               Items="@_spanActionsMenuItems"
                               Title="@Loc[nameof(ControlsStrings.ActionsButtonText)]"
                               slot="end" />
@@ -125,7 +125,7 @@
                         @WriteSpanLink(context)
                     </TemplateColumn>
                     <TemplateColumn Title="@Loc[nameof(ControlsStrings.SpanDetailsDetailsColumnHeader)]">
-                        <FluentButton OnClick="@(() => OnViewDetailsAsync(context))" Appearance="Appearance.Lightweight" Class="button-hyperlink" IconStart="new Icons.Regular.Size16.GanttChart()">
+                        <FluentButton OnClick="@(() => OnViewDetailsAsync(context))" Appearance="Appearance.Lightweight" Class="button-hyperlink" IconStart="new Octicons.Size16.GanttChart()">
                             @OtlpHelpers.ToShortenedId(context.SpanId)
                         </FluentButton>
                     </TemplateColumn>
@@ -153,7 +153,7 @@
                         @WriteSpanLink(context)
                     </TemplateColumn>
                     <TemplateColumn Title="@Loc[nameof(ControlsStrings.SpanDetailsDetailsColumnHeader)]">
-                        <FluentButton OnClick="@(() => OnViewDetailsAsync(context))" Appearance="Appearance.Lightweight" Class="button-hyperlink" IconStart="new Icons.Regular.Size16.GanttChart()">
+                        <FluentButton OnClick="@(() => OnViewDetailsAsync(context))" Appearance="Appearance.Lightweight" Class="button-hyperlink" IconStart="new Octicons.Size16.GanttChart()">
                             @OtlpHelpers.ToShortenedId(context.SpanId)
                         </FluentButton>
                     </TemplateColumn>
@@ -175,7 +175,7 @@
 
         return @<div>
         <div class="spanlink-container" style="height:32px;">
-            <span class="spanlink-text" title="@content" style="padding-left:5px; border-left-width: 5px; border-left-style: solid; border-left-color: @(color);">
+            <span class="spanlink-text resource-pill" title="@content" style="--resource-color: @(color);">
                 @content
             </span>
         </div>

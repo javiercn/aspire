@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Concurrent;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Diagnostics;
 using Aspire.Dashboard.Components.Layout;
 using Aspire.Dashboard.Configuration;
@@ -17,7 +18,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Pages;
 
@@ -480,7 +480,7 @@ public partial class Resources : ComponentBase, IComponentWithTelemetry, IAsyncD
                 IsDisabled = false,
                 OnClick = _onToggleCollapseAllCallback.InvokeAsync,
                 Text = Loc[nameof(Dashboard.Resources.Resources.ResourceExpandAllChildren)],
-                Icon = new Icons.Regular.Size16.Eye()
+                Icon = new Octicons.Size16.Eye()
             });
         }
         else
@@ -490,7 +490,7 @@ public partial class Resources : ComponentBase, IComponentWithTelemetry, IAsyncD
                 IsDisabled = false,
                 OnClick = _onToggleCollapseAllCallback.InvokeAsync,
                 Text = Loc[nameof(Dashboard.Resources.Resources.ResourceCollapseAllChildren)],
-                Icon = new Icons.Regular.Size16.EyeOff()
+                Icon = new Octicons.Size16.EyeOff()
             });
         }
 
@@ -501,7 +501,7 @@ public partial class Resources : ComponentBase, IComponentWithTelemetry, IAsyncD
                 IsDisabled = false,
                 OnClick = _onToggleResourceTypeCallback.InvokeAsync,
                 Text = Loc[nameof(Dashboard.Resources.Resources.ResourcesHideTypes)],
-                Icon = new Icons.Regular.Size16.EyeOff()
+                Icon = new Octicons.Size16.EyeOff()
             });
         }
         else
@@ -511,7 +511,7 @@ public partial class Resources : ComponentBase, IComponentWithTelemetry, IAsyncD
                 IsDisabled = false,
                 OnClick = _onToggleResourceTypeCallback.InvokeAsync,
                 Text = Loc[nameof(Dashboard.Resources.Resources.ResourcesShowTypes)],
-                Icon = new Icons.Regular.Size16.Eye()
+                Icon = new Octicons.Size16.Eye()
             });
         }
 

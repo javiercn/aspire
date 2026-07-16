@@ -6,13 +6,17 @@ import {
     neutralLayerL2,
     neutralPalette,
     DesignToken,
-    neutralFillLayerRestDelta
+    neutralFillLayerRestDelta,
+    updateNeutralBaseColor,
+    controlCornerRadius,
+    layerCornerRadius,
+    bodyFont
 } from "/_content/Microsoft.FluentUI.AspNetCore.Components/Microsoft.FluentUI.AspNetCore.Components.lib.module.js";
 
 const currentThemeCookieName = "currentTheme";
 const themeSettingDark = "Dark";
 const themeSettingLight = "Light";
-const darkThemeLuminance = 0.19;
+const darkThemeLuminance = 0.15;
 const lightThemeLuminance = 1.0;
 const darknessLuminanceTarget = (-0.1 + Math.sqrt(0.21)) / 2;
 
@@ -140,19 +144,47 @@ function getBaseLayerLuminanceForTheme(theme) {
 }
 
 /**
- * Configures the accent color palette based on the .NET purple
+ * Configures the accent color palette to match the GitHub Copilot look.
  */
 function setAccentColor() {
     // Convert the base color ourselves to avoid pulling in the
     // @microsoft/fast-colors library just for one call to parseColorHexRGB
-    const baseColor = { // #512BD4
-        r: 0x51 / 255.0,
-        g: 0x2B / 255.0,
-        b: 0xD4 / 255.0
+    const baseColor = { // #0969DA (GitHub Primer accent blue)
+        r: 0x09 / 255.0,
+        g: 0x69 / 255.0,
+        b: 0xDA / 255.0
     };
 
     const accentBase = SwatchRGB.create(baseColor.r, baseColor.g, baseColor.b);
     accentBaseColor.withDefault(accentBase);
+}
+
+/**
+ * Tints the neutral palette per theme to match the GitHub Copilot look.
+ *
+ * FAST generates the neutral ramp from a single base color. When that base has any blue, the
+ * light end of the ramp picks up a green/cyan cast (e.g. #f3f8f8) that looks unnatural over white
+ * surfaces, so light keeps a clean neutral gray. In dark, the same cool base instead yields
+ * GitHub's navy surfaces (#0d1117/#151b23 region) without artifacts, so we tint dark only.
+ * updateNeutralBaseColor takes a hex string.
+ */
+function setNeutralColor(theme) {
+    if (theme === themeSettingDark) {
+        updateNeutralBaseColor("#818b98");
+    } else {
+        updateNeutralBaseColor("#808080");
+    }
+}
+
+/**
+ * Aligns control/surface radii and the body font with GitHub Primer.
+ */
+function setControlDefaults() {
+    // GitHub uses ~6px radius on controls (buttons/inputs) and ~8px on surfaces.
+    controlCornerRadius.withDefault(6);
+    layerCornerRadius.withDefault(8);
+    // Primer system font stack (no Mona Sans dependency).
+    bodyFont.withDefault('-apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif');
 }
 
 /**
@@ -173,6 +205,8 @@ function setFillColor() {
 function applyTheme(theme) {
     setBaseLayerLuminance(theme);
     setAccentColor();
+    setNeutralColor(theme);
+    setControlDefaults();
     setFillColor();
     setThemeOnDocument(theme);
 }

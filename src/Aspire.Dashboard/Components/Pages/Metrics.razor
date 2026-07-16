@@ -156,12 +156,12 @@
                     <div class="empty-content">
                         @if (ViewportInformation.IsDesktop)
                         {
-                            <FluentIcon Icon="Icons.Regular.Size24.ChartMultiple"/>@:&nbsp;
+                            <FluentIcon Icon="Octicons.Size24.ChartMultiple"/>@:&nbsp;
                             @Loc[nameof(Dashboard.Resources.Metrics.MetricsSelectAResource)]
                         }
                         else
                         {
-                            <FluentIcon Icon="Icons.Regular.Size24.ChartMultiple"/>@:&nbsp;
+                            <FluentIcon Icon="Octicons.Size24.ChartMultiple"/>@:&nbsp;
                             <FluentAnchor Href="#" Appearance="Appearance.Hypertext" OnClick="@(async () => await _contentLayout!.OpenMobileToolbarAsync())">@Loc[nameof(Dashboard.Resources.Metrics.MetricsSelectAResource)]</FluentAnchor>
                         }
                     </div>
@@ -169,7 +169,7 @@
                 else
                 {
                     <div class="empty-content">
-                        <FluentIcon Icon="Icons.Regular.Size24.ChartMultiple"/>&nbsp;@Loc[nameof(Dashboard.Resources.Metrics.MetricsNoMetricsForResource)]
+                        <FluentIcon Icon="Octicons.Size24.ChartMultiple"/>&nbsp;@Loc[nameof(Dashboard.Resources.Metrics.MetricsNoMetricsForResource)]
                     </div>
                 }
             </div>

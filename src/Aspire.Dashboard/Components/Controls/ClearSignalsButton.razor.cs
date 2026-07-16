@@ -2,20 +2,20 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Globalization;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Model;
 using Aspire.Dashboard.Otlp.Storage;
 using Aspire.Dashboard.Resources;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Controls;
 
 public partial class ClearSignalsButton : ComponentBase
 {
-    private static readonly Icon s_clearSelectedResourceIcon = new Icons.Regular.Size16.SelectAllOn();
-    private static readonly Icon s_clearAllResourcesIcon = new Icons.Regular.Size16.Stack();
+    private static readonly Icon s_clearSelectedResourceIcon = new Octicons.Size16.SelectAllOn();
+    private static readonly Icon s_clearAllResourcesIcon = new Octicons.Size16.Stack();
 
     [Inject]
     public required IStringLocalizer<ControlsStrings> ControlsStringsLoc { get; init; }

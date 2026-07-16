@@ -7,7 +7,6 @@ using Aspire.Dashboard.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Layout;
 
@@ -169,7 +168,7 @@ public partial class MobileNavMenu : ComponentBase, IAsyncDisposable
         yield return new MobileNavMenuEntry(
             Loc[nameof(Resources.Layout.MainLayoutAspireDashboardHelpLink)],
             LaunchHelpAsync,
-            new Icons.Regular.Size24.QuestionCircle()
+            new Octicons.Size24.QuestionCircle()
         );
 
         if (IsAgentHelpEnabled)
@@ -177,20 +176,20 @@ public partial class MobileNavMenu : ComponentBase, IAsyncDisposable
             yield return new MobileNavMenuEntry(
                 Loc[nameof(Resources.Layout.MainLayoutLaunchAIAgents)],
                 LaunchAIAgentsAsync,
-                new Icons.Regular.Size24.BotSparkle()
+                new Octicons.Size24.BotSparkle()
             );
         }
 
         yield return new MobileNavMenuEntry(
             Loc[nameof(Resources.Layout.MainLayoutLaunchNotifications)],
             LaunchNotificationsAsync,
-            new Icons.Regular.Size24.Alert()
+            new Octicons.Size24.Alert()
         );
 
         yield return new MobileNavMenuEntry(
             Loc[nameof(Resources.Layout.MainLayoutLaunchSettings)],
             LaunchSettingsAsync,
-            new Icons.Regular.Size24.Settings()
+            new Octicons.Size24.Settings()
         );
     }
 

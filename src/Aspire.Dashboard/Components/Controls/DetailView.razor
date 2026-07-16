@@ -22,7 +22,7 @@
                               aria-label="@(Orientation == Orientation.Horizontal ? Loc[nameof(ControlsStrings.SummaryDetailsViewSplitHorizontal)] : Loc[nameof(ControlsStrings.SummaryDetailsViewSplitVertical)])"/>
             }
 
-            <FluentButton Appearance="Appearance.Stealth" BackgroundColor="@(ViewportInformation.IsDesktop ? null : "rgba(0, 0, 0, 0)")" IconEnd="@(new Icons.Regular.Size16.Dismiss())"
+            <FluentButton Appearance="Appearance.Stealth" BackgroundColor="@(ViewportInformation.IsDesktop ? null : "rgba(0, 0, 0, 0)")" IconEnd="@(new Octicons.Size16.Dismiss())"
                           OnClick="HandleDismissAsync" Title="@Loc[nameof(ControlsStrings.SummaryDetailsViewCloseView)]" aria-label="@Loc[nameof(ControlsStrings.SummaryDetailsViewCloseView)]"/>
         </div>
     </header>
@@ -30,8 +30,8 @@
 </div>
 
 @code {
-    private readonly Icon _splitHorizontalIcon = new Icons.Regular.Size16.SplitHorizontal();
-    private readonly Icon _splitVerticalIcon = new Icons.Regular.Size16.SplitVertical();
+    private readonly Icon _splitHorizontalIcon = new Octicons.Size16.SplitHorizontal();
+    private readonly Icon _splitVerticalIcon = new Octicons.Size16.SplitVertical();
 
     [Parameter]
     public string? DetailsTitle { get; set; }

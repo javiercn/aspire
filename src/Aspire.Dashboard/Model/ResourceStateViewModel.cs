@@ -2,12 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Extensions;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Resources;
 using Humanizer;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -39,56 +39,56 @@ internal class ResourceStateViewModel(string text, Icon icon, Color color)
             if (resource.TryGetExitCode(out var exitCode) && exitCode is not 0)
             {
                 // Process completed unexpectedly, hence the non-zero code. This is almost certainly an error, so warn users.
-                icon = new Icons.Filled.Size16.ErrorCircle();
+                icon = new Octicons.Size16.ErrorCircle();
                 color = Color.Error;
             }
             else if (resource.IsFinishedState() || resource.IsExitedState())
             {
                 // Process completed successfully.
-                icon = new Icons.Regular.Size16.RecordStop();
+                icon = new Octicons.Size16.RecordStop();
                 color = Color.Info;
             }
             else
             {
                 // Process completed, which may not have been unexpected.
-                icon = new Icons.Filled.Size16.Warning();
+                icon = new Octicons.Size16.Warning();
                 color = Color.Warning;
             }
         }
         else if (resource.IsUnusableTransitoryState() || resource.IsUnknownState() || resource.IsNotStarted())
         {
-            icon = new Icons.Filled.Size16.CircleHint(); // A dashed, hollow circle.
+            icon = new Octicons.Size16.CircleHint(); // A dashed, hollow circle.
             color = Color.Info;
         }
         else if (resource.IsRuntimeUnhealthy())
         {
-            icon = new Icons.Filled.Size16.Warning();
+            icon = new Octicons.Size16.Warning();
             color = Color.Warning;
         }
         else if (resource.HasNoState())
         {
-            icon = new Icons.Filled.Size16.Circle();
+            icon = new Octicons.Size16.Circle();
             color = Color.Info;
         }
         else if (!string.IsNullOrEmpty(resource.StateStyle))
         {
             (icon, color) = resource.StateStyle switch
             {
-                "warning" => ((Icon)new Icons.Filled.Size16.Warning(), Color.Warning),
-                "error" => (new Icons.Filled.Size16.ErrorCircle(), Color.Error),
-                "success" => (new Icons.Filled.Size16.CheckmarkCircle(), Color.Success),
-                "info" => (new Icons.Filled.Size16.Info(), Color.Info),
-                _ => (new Icons.Filled.Size16.Circle(), Color.Neutral)
+                "warning" => ((Icon)new Octicons.Size16.Warning(), Color.Warning),
+                "error" => (new Octicons.Size16.ErrorCircle(), Color.Error),
+                "success" => (new Octicons.Size16.CheckmarkCircle(), Color.Success),
+                "info" => (new Octicons.Size16.Info(), Color.Info),
+                _ => (new Octicons.Size16.Circle(), Color.Neutral)
             };
         }
         else if (resource.HealthStatus is HealthStatus.Unhealthy or HealthStatus.Degraded)
         {
-            icon = new Icons.Filled.Size16.CheckmarkCircleWarning();
+            icon = new Octicons.Size16.CheckmarkCircleWarning();
             color = Color.Warning;
         }
         else
         {
-            icon = new Icons.Filled.Size16.CheckmarkCircle();
+            icon = new Octicons.Size16.CheckmarkCircle();
             color = Color.Success;
         }
 

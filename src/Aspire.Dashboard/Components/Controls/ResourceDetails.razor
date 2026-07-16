@@ -21,7 +21,7 @@
         <FluentDivider slot="end" Role="DividerRole.Presentation" Orientation="Orientation.Vertical" />
         <AspireMenuButton ButtonAppearance="Appearance.Lightweight"
                           ButtonClass="resource-details-actions"
-                          Icon="@(new Icons.Regular.Size20.Options())"
+                          Icon="@(new Octicons.Size20.Options())"
                           Items="@_resourceActionsMenuItems"
                           Title="@Loc[nameof(Aspire.Dashboard.Resources.Resources.ResourcesChangeViewOptions)]"
                           slot="end" />
@@ -122,7 +122,7 @@
                                 <ContentBeforeValue>
                                     @if (context.IsReadOnly)
                                     {
-                                        <FluentIcon Value="@(new Icons.Regular.Size16.LockClosed())" Class="volume-mount-type-icon" />
+                                        <FluentIcon Value="@(new Octicons.Size16.LockClosed())" Class="volume-mount-type-icon" />
                                     }
                                 </ContentBeforeValue>
                             </GridValue>

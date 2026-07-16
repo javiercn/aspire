@@ -2,10 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Utils;
+using Aspire.Dashboard.Components.CustomIcons;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components;
 
@@ -24,9 +24,9 @@ public partial class IconCheckbox : ComponentBase, IAsyncDisposable
 
     // The control owns the mapping from state to icon so callers only describe the
     // checked state via CheckState rather than wiring up icons and aria values themselves.
-    private static readonly Icon s_uncheckedIcon = new Icons.Regular.Size20.CheckboxUnchecked().WithColor(Color.FillInverse);
-    private static readonly Icon s_checkedIcon = new Icons.Filled.Size20.CheckboxChecked();
-    private static readonly Icon s_indeterminateIcon = new Icons.Filled.Size20.CheckboxIndeterminate();
+    private static readonly Icon s_uncheckedIcon = new Octicons.Size20.CheckboxUnchecked().WithColor(Color.FillInverse);
+    private static readonly Icon s_checkedIcon = new Octicons.Size20.CheckboxChecked();
+    private static readonly Icon s_indeterminateIcon = new Octicons.Size20.CheckboxIndeterminate();
 
     private ElementReference _element;
     private IJSObjectReference? _jsModule;

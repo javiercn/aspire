@@ -2,9 +2,9 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Model;
+using Aspire.Dashboard.Components.CustomIcons;
 using Microsoft.AspNetCore.Components;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Dialogs;
 
@@ -32,10 +32,10 @@ public partial class NotificationEntryComponent : ComponentBase
 
     private Icon Icon => Entry.Intent switch
     {
-        MessageIntent.Success => new Icons.Filled.Size20.CheckmarkCircle(),
-        MessageIntent.Error => new Icons.Filled.Size20.DismissCircle(),
-        MessageIntent.Warning => new Icons.Filled.Size20.Warning(),
-        _ => new Icons.Filled.Size20.Info()
+        MessageIntent.Success => new Octicons.Size20.CheckmarkCircle(),
+        MessageIntent.Error => new Octicons.Size20.DismissCircle(),
+        MessageIntent.Warning => new Octicons.Size20.Warning(),
+        _ => new Octicons.Size20.Info()
     };
 
     private Color IconColor => Entry.Intent switch

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Globalization;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Model;
 using Aspire.Dashboard.Model.Interaction;
 using Aspire.Dashboard.Model.Markdown;
@@ -13,7 +14,6 @@ using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Dialogs;
 
@@ -280,8 +280,8 @@ public partial class InteractionsInputDialog : IAsyncDisposable
     private static Icon GetSecretTextIcon(InputViewModel inputModel)
     {
         return inputModel.IsSecretTextVisible
-            ? new Icons.Regular.Size16.EyeOff()
-            : new Icons.Regular.Size16.Eye();
+            ? new Octicons.Size16.EyeOff()
+            : new Octicons.Size16.Eye();
     }
 
     public async ValueTask DisposeAsync()

@@ -2,13 +2,13 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Globalization;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Otlp.Model;
 using Aspire.Dashboard.Resources;
 using Aspire.Dashboard.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -53,7 +53,7 @@ public static class TraceLinkHelpers
                 Content = new MessageBoxContent
                 {
                     Intent = MessageBoxIntent.Info,
-                    Icon = new Icons.Filled.Size24.Info(),
+                    Icon = new Octicons.Size24.Info(),
                     IconColor = Color.Info,
                     MarkupMessage = new MarkupString(unavailableText),
                 },

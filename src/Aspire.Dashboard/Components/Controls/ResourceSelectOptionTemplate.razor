@@ -5,7 +5,7 @@
 <FluentStack Orientation="Orientation.Horizontal" HorizontalGap="3">
     @if (ViewModel.Id?.Type is OtlpResourceType.ResourceGrouping)
     {
-        <FluentIcon Icon="Icons.Regular.Size20.AppsList"
+        <FluentIcon Icon="Octicons.Size20.AppsList"
                     Color="Color.Accent"
                     Style="vertical-align: text-bottom;"/>
         <span>@ViewModel.Name (<span class="resource-select-resource-label">@Loc[nameof(ControlsStrings.ApplicationLower)]</span>)</span>

@@ -8,7 +8,7 @@
     var id = $"typeFilterButton-{Filter.SanitizedHtmlId}-{Guid.NewGuid()}";
 }
 <FluentButton id="@id"
-              IconEnd="@(new Icons.Regular.Size20.Filter())"
+              IconEnd="@(new Octicons.Size20.Filter())"
               Appearance="@(Filter.AreAllValuesSelected is true ? Appearance.Stealth : Appearance.Accent)"
               @onclick="() => Filter.PopupVisible = !Filter.PopupVisible"
               aria-label="@(Filter.AreAllValuesSelected is true ? Loc[nameof(ControlsStrings.ChartContainerAllTags)] : Loc[nameof(ControlsStrings.ChartContainerFilteredTags)])" />

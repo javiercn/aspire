@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Components.Dialogs;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Model;
 using Aspire.Dashboard.Model.Otlp;
 using Aspire.Dashboard.Resources;
@@ -35,7 +36,7 @@ public static class FilterHelpers
             {
                 OnClick = () => openFilterAsync(filter),
                 Text = filter.GetDisplayText(filterLoc),
-                Icon = filter.Enabled ? new Icons.Regular.Size16.Play() : new Icons.Regular.Size16.Pause(),
+                Icon = filter.Enabled ? new Octicons.Size16.Play() : new Icons.Regular.Size16.Pause(),
                 Class = "filter-menu-item",
             });
         }
@@ -67,7 +68,7 @@ public static class FilterHelpers
             filterMenuItems.Add(new MenuButtonItem
             {
                 Text = dialogsLoc[nameof(Dialogs.FilterDialogEnableAll)],
-                Icon = new Icons.Regular.Size16.Play(),
+                Icon = new Octicons.Size16.Play(),
                 OnClick = async () =>
                 {
                     foreach (var filter in filters)
@@ -83,7 +84,7 @@ public static class FilterHelpers
         filterMenuItems.Add(new MenuButtonItem
         {
             Text = dialogsLoc[nameof(Dialogs.SettingsRemoveAllButtonText)],
-            Icon = new Icons.Regular.Size16.Delete(),
+            Icon = new Octicons.Size16.Delete(),
             OnClick = async () =>
             {
                 clearFilters();

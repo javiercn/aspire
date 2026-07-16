@@ -2,25 +2,25 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Otlp.Model;
 using Aspire.Dashboard.Resources;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model.GenAI;
 
 [DebuggerDisplay("Index = {Index}, Type = {Type}, ResourceName = {ResourceName}")]
 public class GenAIItemViewModel
 {
-    private static readonly Icon s_toolCallsIcon = new Icons.Regular.Size16.Code();
-    private static readonly Icon s_messageIcon = new Icons.Regular.Size16.Mail();
-    private static readonly Icon s_errorIcon = new Icons.Regular.Size16.ErrorCircle();
+    private static readonly Icon s_toolCallsIcon = new Octicons.Size16.Code();
+    private static readonly Icon s_messageIcon = new Octicons.Size16.Mail();
+    private static readonly Icon s_errorIcon = new Octicons.Size16.ErrorCircle();
 
-    private static readonly Icon s_personIcon = new Icons.Filled.Size16.Person();
-    private static readonly Icon s_systemIcon = new Icons.Filled.Size16.Laptop();
-    private static readonly Icon s_toolIcon = new Icons.Filled.Size20.CodeCircle(); // used in 16px size
-    private static readonly Icon s_cloudErrorIcon = new Icons.Filled.Size16.CloudError();
+    private static readonly Icon s_personIcon = new Octicons.Size16.Person();
+    private static readonly Icon s_systemIcon = new Octicons.Size16.Laptop();
+    private static readonly Icon s_toolIcon = new Octicons.Size20.CodeCircle(); // used in 16px size
+    private static readonly Icon s_cloudErrorIcon = new Octicons.Size16.CloudError();
 
     public required int Index { get; set; }
     public required long? InternalId { get; init; }

@@ -4,8 +4,8 @@
 namespace Aspire.Dashboard.Model;
 
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Aspire.Dashboard.Components.CustomIcons;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 internal static class ResourceIconHelpers
 {
@@ -66,10 +66,10 @@ internal static class ResourceIconHelpers
     {
         return healthStatus switch
         {
-            HealthStatus.Healthy => (new Icons.Filled.Size16.Heart(), Color.Success),
-            HealthStatus.Degraded => (new Icons.Filled.Size16.HeartBroken(), Color.Warning),
-            HealthStatus.Unhealthy => (new Icons.Filled.Size16.HeartBroken(), Color.Error),
-            _ => (new Icons.Regular.Size16.CircleHint(), Color.Info)
+            HealthStatus.Healthy => (new Octicons.Size16.Heart(), Color.Success),
+            HealthStatus.Degraded => (new Octicons.Size16.HeartBroken(), Color.Warning),
+            HealthStatus.Unhealthy => (new Octicons.Size16.HeartBroken(), Color.Error),
+            _ => (new Octicons.Size16.CircleHint(), Color.Info)
         };
     }
 }

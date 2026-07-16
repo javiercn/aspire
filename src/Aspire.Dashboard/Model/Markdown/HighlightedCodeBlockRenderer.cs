@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Text;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Extensions;
 using Aspire.Dashboard.Resources;
 using Markdig.Renderers;
@@ -9,14 +10,13 @@ using Markdig.Renderers.Html;
 using Markdig.Syntax;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model.Markdown;
 
 public class HighlightedCodeBlockRenderer : HtmlObjectRenderer<CodeBlock>
 {
-    private static readonly Icon s_copyIcon = new Icons.Regular.Size16.Copy();
-    private static readonly Icon s_checkmarkIcon = new Icons.Regular.Size16.Checkmark();
+    private static readonly Icon s_copyIcon = new Octicons.Size16.Copy();
+    private static readonly Icon s_checkmarkIcon = new Octicons.Size16.Checkmark();
 
     private readonly IStringLocalizer<ControlsStrings> _loc;
 

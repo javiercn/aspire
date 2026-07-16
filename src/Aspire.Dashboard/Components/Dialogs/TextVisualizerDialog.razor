@@ -8,7 +8,7 @@
 
 <FluentDialogHeader ShowDismiss="true">
     <div class="dialog-title-grid">
-        <FluentIcon Value="@(new Icons.Regular.Size24.SlideSearch())" Style="grid-area: dialog-icon; align-self: center;" />
+        <FluentIcon Value="@(new Octicons.Size24.SlideSearch())" Style="grid-area: dialog-icon; align-self: center;" />
         <FluentLabel Typo="Typography.PaneHeader" Class="col-long-content" Style="grid-area: dialog-title;">
             @Content.Description
         </FluentLabel>
@@ -53,7 +53,7 @@
             @* Don't display until ShowSecretsWarning is loaded and is known to be true *@
             <div class="block-warning">
                 <div class="block-warning-icon">
-                    <FluentIcon Value="new Icons.Filled.Size16.Warning()" Color="Color.Warning" />
+                    <FluentIcon Value="new Octicons.Size16.Warning()" Color="Color.Warning" />
                 </div>
 
                 <div class="block-warning-message">
@@ -78,7 +78,7 @@
                     <FluentButton OnClick="@DownloadAsync"
                                   Title="@ControlsStringsLoc[nameof(ControlsStrings.Download)]"
                                   aria-label="@ControlsStringsLoc[nameof(ControlsStrings.Download)]"
-                                  IconStart="new Icons.Regular.Size16.ArrowDownload()">
+                                  IconStart="new Octicons.Size16.ArrowDownload()">
                         @ControlsStringsLoc[nameof(ControlsStrings.Download)]
                     </FluentButton>
                 }
@@ -86,8 +86,8 @@
                 <FluentButton Id="@_copyButtonId"
                               AdditionalAttributes="@FluentUIExtensions.GetClipboardCopyAdditionalAttributes(TextVisualizerViewModel.FormattedText, ControlsStringsLoc[nameof(ControlsStrings.GridValueCopyToClipboard)], ControlsStringsLoc[nameof(ControlsStrings.GridValueCopied)])">
                     <span slot="start">
-                        <FluentIcon Class="copy-icon" Style="display:inline; vertical-align: text-bottom" Icon="Icons.Regular.Size16.Copy" Slot="start" />
-                        <FluentIcon Class="checkmark-icon" Style="display:none; vertical-align: text-bottom" Icon="Icons.Regular.Size16.Checkmark" Slot="start" />
+                        <FluentIcon Class="copy-icon" Style="display:inline; vertical-align: text-bottom" Icon="Octicons.Size16.Copy" Slot="start" />
+                        <FluentIcon Class="checkmark-icon" Style="display:none; vertical-align: text-bottom" Icon="Octicons.Size16.Checkmark" Slot="start" />
                     </span>
                     @ControlsStringsLoc[nameof(ControlsStrings.GridValueCopyToClipboard)]
                 </FluentButton>

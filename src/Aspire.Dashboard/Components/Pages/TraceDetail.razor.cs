@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Globalization;
 using Aspire.Dashboard.Components.Dialogs;
 using Aspire.Dashboard.Components.Layout;
@@ -18,7 +19,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
 using Microsoft.JSInterop;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Components.Pages;
 
@@ -139,7 +139,7 @@ public partial class TraceDetail : ComponentBase, IComponentWithTelemetry, IDisp
         _traceActionsMenuItems.Add(new MenuButtonItem
         {
             Text = ControlStringsLoc[nameof(ControlsStrings.ExpandAllSpansText)],
-            Icon = new Icons.Regular.Size16.ArrowExpandAll(),
+            Icon = new Octicons.Size16.ArrowExpandAll(),
             OnClick = ExpandAllSpansAsync,
             IsDisabled = !HasCollapsedSpans()
         });
@@ -147,7 +147,7 @@ public partial class TraceDetail : ComponentBase, IComponentWithTelemetry, IDisp
         _traceActionsMenuItems.Add(new MenuButtonItem
         {
             Text = ControlStringsLoc[nameof(ControlsStrings.CollapseAllSpansText)],
-            Icon = new Icons.Regular.Size16.ArrowCollapseAll(),
+            Icon = new Octicons.Size16.ArrowCollapseAll(),
             OnClick = CollapseAllSpansAsync,
             IsDisabled = !HasExpandedSpans()
         });

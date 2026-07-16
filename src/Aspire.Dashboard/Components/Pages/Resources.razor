@@ -35,7 +35,7 @@
             {
                 <FluentButton id="resourceFilterButton" slot="end"
                               Appearance="@(NoFiltersSet ? Appearance.Stealth : Appearance.Accent)"
-                              IconEnd="@(new Icons.Regular.Size20.Filter())"
+                              IconEnd="@(new Octicons.Size20.Filter())"
                               @onclick="() => _isFilterPopupVisible = !_isFilterPopupVisible"
                               Title="@(NoFiltersSet ? Loc[nameof(Dashboard.Resources.Resources.ResourcesNotFiltered)] : Loc[nameof(Dashboard.Resources.Resources.ResourcesFiltered)])"
                               aria-label="@(NoFiltersSet ? Loc[nameof(Dashboard.Resources.Resources.ResourcesNotFiltered)] : Loc[nameof(Dashboard.Resources.Resources.ResourcesFiltered)])" />
@@ -43,7 +43,7 @@
                 @if (HasViewOptionsMenu())
                 {
                     <AspireMenuButton ButtonAppearance="Appearance.Stealth"
-                                      Icon="@(new Icons.Regular.Size20.Options())"
+                                      Icon="@(new Octicons.Size20.Options())"
                                       Items="@_resourcesMenuItems"
                                       RestoreFocusOnItemClick="true"
                                       Title="@Loc[nameof(Dashboard.Resources.Resources.ResourcesChangeViewOptions)]"
@@ -109,20 +109,20 @@
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-{ResourceViewKind.Table}")"
                                                Label="@ControlsStringsLoc[nameof(ControlsStrings.ResourcesContainerTableTab)]"
-                                               Icon="@(new Icons.Regular.Size24.Table())"
+                                               Icon="@(new Octicons.Size24.Table())"
                                                fixed>
                                     </FluentTab>
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-{ResourceViewKind.Parameters}")"
                                                Label="@ControlsStringsLoc[nameof(ControlsStrings.ResourcesContainerParametersTab)]"
-                                               Icon="@(new Icons.Regular.Size24.Key())"
+                                               Icon="@(new Octicons.Size24.Key())"
                                                fixed>
                                     </FluentTab>
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-{ResourceViewKind.Graph}")"
                                                aria-label="@ControlsStringsLoc[nameof(ControlsStrings.ResourcesContainerGraphAccessibleLabel)]"
                                                Label="@ControlsStringsLoc[nameof(ControlsStrings.ResourcesContainerGraphTab)]"
-                                               Icon="@(new Icons.Regular.Size24.ShareAndroid())"
+                                               Icon="@(new Octicons.Size24.ShareAndroid())"
                                                fixed>
                                     </FluentTab>
                                 </FluentTabs>
@@ -162,7 +162,7 @@
                                                         @if (context.Children.Count > 0)
                                                         {
                                                             <FluentButton aria-label="@ControlsStringsLoc[nameof(ControlsStrings.ToggleNesting)]" Appearance="Appearance.Lightweight" Class="main-grid-expand-button" OnClick="@(() => OnToggleCollapse(context))">
-                                                                <FluentIcon Icon="Icons.Regular.Size12.ChevronRight" Color="Color.Neutral" />
+                                                                <FluentIcon Icon="Octicons.Size12.ChevronRight" Color="Color.Neutral" />
                                                             </FluentButton>
                                                         }
                                                     </span>
@@ -228,7 +228,7 @@
                                             </AspireTemplateColumn>
                                         </ChildContent>
                                         <EmptyContent>
-                                            <FluentIcon Value="@(PageViewModel.SelectedViewKind == ResourceViewKind.Parameters ? (Icon)new Icons.Regular.Size24.Key() : new Icons.Regular.Size24.AppGeneric())" />&nbsp;@(PageViewModel.SelectedViewKind == ResourceViewKind.Parameters ? Loc[nameof(Dashboard.Resources.Resources.ResourcesNoParameters)] : Loc[nameof(Dashboard.Resources.Resources.ResourcesNoResources)])
+                                            <FluentIcon Value="@(PageViewModel.SelectedViewKind == ResourceViewKind.Parameters ? (Icon)new Octicons.Size24.Key() : new Octicons.Size24.AppGeneric())" />&nbsp;@(PageViewModel.SelectedViewKind == ResourceViewKind.Parameters ? Loc[nameof(Dashboard.Resources.Resources.ResourcesNoParameters)] : Loc[nameof(Dashboard.Resources.Resources.ResourcesNoResources)])
                                         </EmptyContent>
                                     </FluentDataGrid>
                                 </GridColumnManager>
@@ -243,19 +243,19 @@
                                                       Class="graph-zoom-in"
                                                       Title="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphZoomInButton)]"
                                                       aria-label="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphZoomInButton)]">
-                                            <FluentIcon Value="new Icons.Regular.Size24.ZoomIn()" Color="Color.Accent" />
+                                            <FluentIcon Value="new Octicons.Size24.ZoomIn()" Color="Color.Accent" />
                                         </FluentButton>
                                         <FluentButton Appearance="Appearance.Stealth"
                                                       Class="graph-zoom-out"
                                                       Title="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphZoomOutButton)]"
                                                       aria-label="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphZoomOutButton)]">
-                                            <FluentIcon Value="new Icons.Regular.Size24.ZoomOut()" Color="Color.Accent" />
+                                            <FluentIcon Value="new Octicons.Size24.ZoomOut()" Color="Color.Accent" />
                                         </FluentButton>
                                         <FluentButton Appearance="Appearance.Stealth"
                                                       Class="graph-reset"
                                                       Title="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphResetButton)]"
                                                       aria-label="@Loc[nameof(Dashboard.Resources.Resources.ResourcesGraphResetButton)]">
-                                            <FluentIcon Value="new Icons.Regular.Size24.ArrowReset()" Color="Color.Accent" />
+                                            <FluentIcon Value="new Octicons.Size24.ArrowReset()" Color="Color.Accent" />
                                         </FluentButton>
                                     </div>
                                 </div>

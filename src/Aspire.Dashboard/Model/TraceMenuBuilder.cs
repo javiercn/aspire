@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Dashboard.Components.Dialogs;
+using Aspire.Dashboard.Components.CustomIcons;
 using Aspire.Dashboard.Otlp.Model;
 using Aspire.Dashboard.Otlp.Storage;
 using Aspire.Dashboard.Resources;
@@ -9,7 +10,6 @@ using Aspire.Dashboard.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Localization;
 using Microsoft.FluentUI.AspNetCore.Components;
-using Icons = Microsoft.FluentUI.AspNetCore.Components.Icons;
 
 namespace Aspire.Dashboard.Model;
 
@@ -18,9 +18,9 @@ namespace Aspire.Dashboard.Model;
 /// </summary>
 public sealed class TraceMenuBuilder
 {
-    private static readonly Icon s_viewDetailsIcon = new Icons.Regular.Size16.Info();
-    private static readonly Icon s_structuredLogsIcon = new Icons.Regular.Size16.SlideTextSparkle();
-    private static readonly Icon s_bracesIcon = new Icons.Regular.Size16.Braces();
+    private static readonly Icon s_viewDetailsIcon = new Octicons.Size16.Info();
+    private static readonly Icon s_structuredLogsIcon = new Octicons.Size16.SlideTextSparkle();
+    private static readonly Icon s_bracesIcon = new Octicons.Size16.Braces();
 
     private readonly IStringLocalizer<ControlsStrings> _controlsLoc;
     private readonly NavigationManager _navigationManager;

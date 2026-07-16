@@ -6,7 +6,7 @@
 
 <FluentDialogHeader ShowDismiss="true">
     <div class="dialog-title-grid">
-        <FluentIcon Value="@(new Icons.Regular.Size24.Sparkle())" Style="grid-area: dialog-icon; align-self: center;" />
+        <FluentIcon Value="@(new Octicons.Size24.Sparkle())" Style="grid-area: dialog-icon; align-self: center;" />
         <FluentLabel Typo="Typography.PaneHeader" Class="col-long-content" Style="grid-area: dialog-title;">
             @Content.Title
             <span class="trace-id">@OtlpHelpers.ToShortenedId(Content.Span.SpanId)</span>
@@ -15,11 +15,11 @@
         @if (_contextSpans.Count > 1)
         {
             <div Style="grid-area: dialog-format;">
-                <FluentButton IconStart="new Icons.Regular.Size16.ArrowUp()"
+                <FluentButton IconStart="new Octicons.Size16.ArrowUp()"
                               Appearance="Appearance.Stealth"
                               Disabled="@NoPreviousGenAISpan"
                               OnClick="OnPreviousGenAISpan">@Loc[nameof(Dialogs.GenAIPreviousButtonText)]</FluentButton>
-                <FluentButton IconStart="new Icons.Regular.Size16.ArrowDown()"
+                <FluentButton IconStart="new Octicons.Size16.ArrowDown()"
                               Appearance="Appearance.Stealth"
                               Disabled="@NoNextGenAISpan"
                               OnClick="OnNextGenAISpan">@Loc[nameof(Dialogs.GenAINextButtonText)]</FluentButton>
@@ -56,7 +56,7 @@
                                 <FluentButton Class="back-button"
                                               Appearance="Appearance.Stealth"
                                               OnClick="@GoBackAsync">
-                                    <FluentIcon Value="@(new Icons.Regular.Size16.ArrowHookUpLeft())" />
+                                    <FluentIcon Value="@(new Octicons.Size16.ArrowHookUpLeft())" />
                                 </FluentButton>
                             </div>
                             @*
@@ -69,12 +69,12 @@
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-message-{ItemViewKind.Preview}")"
                                                Label="@Loc[nameof(Dialogs.GenAIPreviewTabText)]"
-                                               Icon="@(new Icons.Regular.Size24.PreviewLink())">
+                                               Icon="@(new Octicons.Size24.PreviewLink())">
                                     </FluentTab>
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-message-{ItemViewKind.Raw}")"
                                                Label="@Loc[nameof(Dialogs.GenAIRawTabText)]"
-                                               Icon="@(new Icons.Regular.Size24.Code())">
+                                               Icon="@(new Octicons.Size24.Code())">
                                     </FluentTab>
                                 </FluentTabs>
                             }
@@ -84,7 +84,7 @@
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-message-{ItemViewKind.Raw}")"
                                                Label="@Loc[nameof(Dialogs.GenAIRawTabText)]"
-                                               Icon="@(new Icons.Regular.Size24.Code())">
+                                               Icon="@(new Octicons.Size24.Code())">
                                     </FluentTab>
                                 </FluentTabs>
                             }
@@ -231,8 +231,8 @@
                                       Title="@copyButtonLabel"
                                       AdditionalAttributes="@copyButtonAttributes">
                             <span slot="start">
-                                <FluentIcon Class="copy-icon" Style="display:inline; vertical-align: text-bottom" Icon="Icons.Regular.Size16.Copy" Slot="start" />
-                                <FluentIcon Class="checkmark-icon" Style="display:none; vertical-align: text-bottom" Icon="Icons.Regular.Size16.Checkmark" Slot="start" />
+                                <FluentIcon Class="copy-icon" Style="display:inline; vertical-align: text-bottom" Icon="Octicons.Size16.Copy" Slot="start" />
+                                <FluentIcon Class="checkmark-icon" Style="display:none; vertical-align: text-bottom" Icon="Octicons.Size16.Checkmark" Slot="start" />
                             </span>
                             @ControlsStringsLoc[nameof(ControlsStrings.GridValueCopyToClipboard)]
                         </FluentButton>
@@ -274,13 +274,13 @@
                                 <FluentTab LabelClass="tab-label"
                                            Id="@($"tab-overview-{OverviewViewKind.InputOutput}")"
                                            Label="@Loc[nameof(Dialogs.GenAIInputOutputTabText)]"
-                                           Icon="@(new Icons.Regular.Size24.Chat())">
+                                           Icon="@(new Octicons.Size24.Chat())">
                                 </FluentTab>
                                 @if (Content.ToolDefinitions.Count > 0)
                                 {
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-overview-{OverviewViewKind.Tools}")"
-                                               Icon="@(new Icons.Regular.Size24.Wrench())">
+                                               Icon="@(new Octicons.Size24.Wrench())">
                                         <Header>
                                             <span class="tab-text">@Loc[nameof(Dialogs.GenAIToolsTabText)]</span>
                                             <FluentBadge Appearance="Appearance.Neutral" Circular="true">@Content.ToolDefinitions.Count</FluentBadge>
@@ -291,7 +291,7 @@
                                 {
                                     <FluentTab LabelClass="tab-label"
                                                Id="@($"tab-overview-{OverviewViewKind.Evaluations}")"
-                                               Icon="@(new Icons.Regular.Size24.Scales())">
+                                               Icon="@(new Octicons.Size24.Scales())">
                                         <Header>
                                             <span class="tab-text">@Loc[nameof(Dialogs.GenAIEvaluationsTabText)]</span>
                                             <FluentBadge Appearance="Appearance.Neutral" Circular="true">@Content.Evaluations.Count</FluentBadge>
@@ -301,7 +301,7 @@
                                 <FluentTab LabelClass="tab-label"
                                            Id="@($"tab-overview-{OverviewViewKind.Details}")"
                                            Label="@Loc[nameof(Dialogs.GenAIDetailsTabText)]"
-                                           Icon="@(new Icons.Regular.Size24.Info())">
+                                           Icon="@(new Octicons.Size24.Info())">
                                 </FluentTab>
                             </FluentTabs>
                         </div>
@@ -500,7 +500,7 @@
                         }
                         <span class="defaultHidden">
                             <FluentButton Appearance="Appearance.Lightweight" OnClick="@(() => OnViewItem(item))">
-                                <FluentIcon Icon="Icons.Regular.Size16.SlideSearch" />
+                                <FluentIcon Icon="Octicons.Size16.SlideSearch" />
                             </FluentButton>
                         </span>
                         @if (itemParts.Count > 0)

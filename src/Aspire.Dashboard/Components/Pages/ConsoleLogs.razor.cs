@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Collections.Concurrent;
+using Aspire.Dashboard.Components.CustomIcons;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
@@ -609,7 +610,7 @@ public sealed partial class ConsoleLogs : ComponentBase, IComponentWithTelemetry
             {
                 OnClick = TerminalFontMinusAsync,
                 Text = Loc[nameof(Dashboard.Resources.ConsoleLogs.TerminalToolbarDecreaseFontSize)],
-                Icon = new Icons.Regular.Size16.Subtract(),
+                Icon = new Octicons.Size16.Subtract(),
                 IsDisabled = !fontControlsEnabled || fontPx <= TerminalFontMin,
             });
 
@@ -617,7 +618,7 @@ public sealed partial class ConsoleLogs : ComponentBase, IComponentWithTelemetry
             {
                 OnClick = TerminalFontPlusAsync,
                 Text = Loc[nameof(Dashboard.Resources.ConsoleLogs.TerminalToolbarIncreaseFontSize)],
-                Icon = new Icons.Regular.Size16.Add(),
+                Icon = new Octicons.Size16.Add(),
                 IsDisabled = !fontControlsEnabled || fontPx >= TerminalFontMax,
             });
 
@@ -638,7 +639,7 @@ public sealed partial class ConsoleLogs : ComponentBase, IComponentWithTelemetry
                 _logsMenuItems.Add(new()
                 {
                     Text = Loc[nameof(Dashboard.Resources.ConsoleLogs.TerminalToolbarGridSize)],
-                    Icon = new Icons.Regular.Size16.ArrowExpand(),
+                    Icon = new Octicons.Size16.ArrowExpand(),
                     NestedMenuItems = nested,
                 });
             }
@@ -651,7 +652,7 @@ public sealed partial class ConsoleLogs : ComponentBase, IComponentWithTelemetry
                 IsDisabled = PageViewModel.SelectedResource is null && !_isSubscribedToAll,
                 OnClick = DownloadLogsAsync,
                 Text = Loc[nameof(Dashboard.Resources.ConsoleLogs.DownloadLogs)],
-                Icon = new Icons.Regular.Size16.ArrowDownload()
+                Icon = new Octicons.Size16.ArrowDownload()
             });
 
             _logsMenuItems.Add(new()
@@ -685,14 +686,14 @@ public sealed partial class ConsoleLogs : ComponentBase, IComponentWithTelemetry
             {
                 OnClick = () => ToggleTimestampAsync(showTimestamp: !_showTimestamp, isTimestampUtc: _isTimestampUtc),
                 Text = _showTimestamp ? Loc[nameof(Dashboard.Resources.ConsoleLogs.ConsoleLogsTimestampHide)] : Loc[nameof(Dashboard.Resources.ConsoleLogs.ConsoleLogsTimestampShow)],
-                Icon = new Icons.Regular.Size16.CalendarClock()
+                Icon = new Octicons.Size16.CalendarClock()
             });
 
             _logsMenuItems.Add(new()
             {
                 OnClick = () => ToggleTimestampAsync(showTimestamp: _showTimestamp, isTimestampUtc: !_isTimestampUtc),
                 Text = Loc[nameof(Dashboard.Resources.ConsoleLogs.ConsoleLogsTimestampShowUtc)],
-                Icon = _isTimestampUtc ? new Icons.Regular.Size16.CheckboxChecked() : new Icons.Regular.Size16.CheckboxUnchecked(),
+                Icon = _isTimestampUtc ? new Octicons.Size16.CheckboxChecked() : new Octicons.Size16.CheckboxUnchecked(),
                 IsDisabled = !_showTimestamp
             });
 
