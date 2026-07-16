@@ -1,0 +1,21 @@
+/*
+    Cascade-layer entry point for the dashboard stylesheets.
+
+    Declaring the layer order up front makes the GitHub overlay (aspire-github) win over the base
+    dashboard + Fluent styles (aspire-base) regardless of selector specificity, so the overlay does
+    not need !important and stays resilient to upstream Fluent specificity changes. Later layers
+    beat earlier ones, so aspire-github (declared last) always wins.
+
+    Everything is loaded through @import layer(...) because the base sheets (including the generated
+    Fluent scoped-CSS bundle, Aspire.Dashboard.styles.css) cannot be edited to add a layer directly.
+    The overlay itself is gated on [data-ui-variant="github"], so in the Fluent variant these rules
+    match nothing and the base styles apply unchanged.
+*/
+@layer aspire-base, aspire-github;
+
+@import url("/_content/Microsoft.FluentUI.AspNetCore.Components/css/reboot.css") layer(aspire-base);
+@import url("/css/app.css") layer(aspire-base);
+@import url("/Aspire.Dashboard.styles.css") layer(aspire-base);
+@import url("/css/highlight.css") layer(aspire-base);
+@import url("/css/markdown.css") layer(aspire-base);
+@import url("/css/github-theme.css") layer(aspire-github);

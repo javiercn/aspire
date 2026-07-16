@@ -9,7 +9,7 @@
     variable over targeting a component.
 */
 
-:root {
+[data-ui-variant="github"] {
     --gh-fg-muted: #59636e;
     --gh-border-muted: #d1d9e0b3;
     --gh-overlay-bg: #ffffff;
@@ -27,7 +27,7 @@
     --property-grid-genai-dialog-background-color: var(--gh-canvas-muted);
 }
 
-[data-theme="dark"] {
+[data-ui-variant="github"][data-theme="dark"] {
     --gh-fg-muted: #9198a1;
     --gh-border-muted: #3d444db3;
     --gh-overlay-bg: #151b23;
@@ -51,7 +51,7 @@
     are the column resize handles, so hide them until the header is hovered, and mute the header
     label so it reads like a Primer table head.
 */
-.fluent-data-grid {
+[data-ui-variant="github"] .fluent-data-grid {
     /*
         GitHub tables read clean with no persistent vertical column separators. Fluent draws an
         always-on 1px column resize tick (border-inline-end on .resize-handle, colored via this var
@@ -61,11 +61,11 @@
     --fluent-data-grid-resize-handle-color: transparent !important;
 }
 
-.fluent-data-grid th:hover {
+[data-ui-variant="github"] .fluent-data-grid th:hover {
     --fluent-data-grid-resize-handle-color: var(--neutral-stroke-rest) !important;
 }
 
-.fluent-data-grid .column-header {
+[data-ui-variant="github"] .fluent-data-grid .column-header {
     color: var(--gh-fg-muted);
     font-weight: 600;
 }
@@ -84,10 +84,10 @@
     font-style: normal;
 }
 
-h1, h2, h3,
-.page-header h1,
-.fluent-appbar .brand-name,
-.app-title {
+[data-ui-variant="github"] h1, [data-ui-variant="github"] h2, [data-ui-variant="github"] h3,
+[data-ui-variant="github"] .page-header h1,
+[data-ui-variant="github"] .fluent-appbar .brand-name,
+[data-ui-variant="github"] .app-title {
     font-family: "Mona Sans", var(--body-font);
     font-weight: 600;
     /* Primer titles use a slightly tighter tracking. */
@@ -99,7 +99,7 @@ h1, h2, h3,
     Used to render status/level cells as Primer-style labels. Kept as variables so the same hues
     can be reused and tweaked in one place.
 */
-:root {
+[data-ui-variant="github"] {
     --gh-label-red-fg: #c50d28;
     --gh-label-red-bg: #ffe0e3;
     --gh-label-orange-fg: #a24610;
@@ -114,7 +114,7 @@ h1, h2, h3,
     --gh-label-gray-bg: #e8ecf2;
 }
 
-[data-theme="dark"] {
+[data-ui-variant="github"][data-theme="dark"] {
     --gh-label-red-fg: #ff9592;
     --gh-label-red-bg: #33121a;
     --gh-label-orange-fg: #f0883e;
@@ -134,19 +134,19 @@ h1, h2, h3,
     exposed as a class on the row/cell (log-row-error / -warning / -critical / -debug / -trace),
     and Level is the 2nd grid column, so we can style it in pure CSS without changing markup.
 */
-.fluent-data-grid-row.log-row-error td[col-index="2"],
-.fluent-data-grid-row.log-row-critical td[col-index="2"] {
+[data-ui-variant="github"] .fluent-data-grid-row.log-row-error td[col-index="2"],
+[data-ui-variant="github"] .fluent-data-grid-row.log-row-critical td[col-index="2"] {
     color: var(--gh-label-red-fg);
     font-weight: 600;
 }
 
-.fluent-data-grid-row.log-row-warning td[col-index="2"] {
+[data-ui-variant="github"] .fluent-data-grid-row.log-row-warning td[col-index="2"] {
     color: var(--gh-label-yellow-fg);
     font-weight: 600;
 }
 
-.fluent-data-grid-row.log-row-debug td[col-index="2"],
-.fluent-data-grid-row.log-row-trace td[col-index="2"] {
+[data-ui-variant="github"] .fluent-data-grid-row.log-row-debug td[col-index="2"],
+[data-ui-variant="github"] .fluent-data-grid-row.log-row-trace td[col-index="2"] {
     color: var(--gh-fg-muted);
 }
 
@@ -155,7 +155,7 @@ h1, h2, h3,
     the severity icon + text, so we can pill it in pure CSS. The icon keeps its semantic color
     (success/warning/error); the pill itself uses a neutral Primer label background.
 */
-.state-column-cell {
+[data-ui-variant="github"] .state-column-cell {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -174,7 +174,7 @@ h1, h2, h3,
     mixed against the current theme's neutral tokens so contrast stays readable in light and dark
     regardless of which of the ~20 resource colors is used. Markup is unchanged (same span).
 */
-.resource-pill {
+[data-ui-variant="github"] .resource-pill {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -195,7 +195,7 @@ h1, h2, h3,
 
 /* The traces "Spans" tags reuse .trace-tag scoped styles (border/bg) that load after this sheet,
    so override them to render the resource pill. */
-.trace-service-tag.resource-pill {
+[data-ui-variant="github"] .trace-service-tag.resource-pill {
     border: 1px solid color-mix(in srgb, var(--resource-color) 45%, transparent) !important;
     border-left-width: 1px !important;
     padding: 0 8px !important;
@@ -208,25 +208,25 @@ h1, h2, h3,
     Text inputs: GitHub inputs are a full 1px box with a rounded corner and a focus ring, not the
     Fluent bottom "underline". Restyle the Fluent field shadow parts (search/text/number) to match.
 */
-fluent-search::part(root),
-fluent-text-field::part(root),
-fluent-number-field::part(root),
-fluent-select::part(control) {
+[data-ui-variant="github"] fluent-search::part(root),
+[data-ui-variant="github"] fluent-text-field::part(root),
+[data-ui-variant="github"] fluent-number-field::part(root),
+[data-ui-variant="github"] fluent-select::part(control) {
     border: 1px solid var(--neutral-stroke-rest);
     border-radius: 6px;
 }
 
-fluent-search:hover::part(root),
-fluent-text-field:hover::part(root),
-fluent-number-field:hover::part(root),
-fluent-select:hover::part(control) {
+[data-ui-variant="github"] fluent-search:hover::part(root),
+[data-ui-variant="github"] fluent-text-field:hover::part(root),
+[data-ui-variant="github"] fluent-number-field:hover::part(root),
+[data-ui-variant="github"] fluent-select:hover::part(control) {
     border-color: var(--neutral-stroke-hover);
 }
 
-fluent-search:focus-within::part(root),
-fluent-text-field:focus-within::part(root),
-fluent-number-field:focus-within::part(root),
-fluent-select:focus-within::part(control) {
+[data-ui-variant="github"] fluent-search:focus-within::part(root),
+[data-ui-variant="github"] fluent-text-field:focus-within::part(root),
+[data-ui-variant="github"] fluent-number-field:focus-within::part(root),
+[data-ui-variant="github"] fluent-select:focus-within::part(control) {
     border-color: var(--accent-fill-rest);
     box-shadow: 0 0 0 1px var(--accent-fill-rest);
     outline: none;
@@ -236,7 +236,7 @@ fluent-select:focus-within::part(control) {
     Tabs: render the page tabs as a Primer segmented control (rounded track with a pill-shaped
     selected tab and a subtle shadow) instead of the Fluent blue underline indicator.
 */
-fluent-tabs::part(tablist) {
+[data-ui-variant="github"] fluent-tabs::part(tablist) {
     background: var(--neutral-layer-2);
     border: 1px solid var(--neutral-stroke-rest);
     border-radius: 8px;
@@ -244,26 +244,26 @@ fluent-tabs::part(tablist) {
     gap: 2px;
 }
 
-fluent-tabs::part(activeIndicator) {
+[data-ui-variant="github"] fluent-tabs::part(activeIndicator) {
     display: none !important;
 }
 
-fluent-tab {
+[data-ui-variant="github"] fluent-tab {
     border-radius: 6px;
     color: var(--neutral-foreground-rest);
 }
 
-fluent-tab:hover {
+[data-ui-variant="github"] fluent-tab:hover {
     background: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
 }
 
-fluent-tab[aria-selected="true"] {
+[data-ui-variant="github"] fluent-tab[aria-selected="true"] {
     background: var(--neutral-layer-1);
     box-shadow: 0 1px 1px 0 #1f23280a, 0 1px 2px 0 #1f232808;
 }
 
 /* In a segmented control the selected tab reads with the default foreground, not the accent. */
-fluent-tab[aria-selected="true"] svg {
+[data-ui-variant="github"] fluent-tab[aria-selected="true"] svg {
     fill: var(--neutral-foreground-rest) !important;
 }
 
@@ -271,15 +271,15 @@ fluent-tab[aria-selected="true"] svg {
     Metrics meter tree: give it a Primer NavList feel with rounded hover/selected rows and slightly
     stronger group (top-level) labels.
 */
-.metrics-tree fluent-tree-item::part(positioning-region) {
+[data-ui-variant="github"] .metrics-tree fluent-tree-item::part(positioning-region) {
     border-radius: 6px;
 }
 
-.metrics-tree fluent-tree-item:hover::part(positioning-region) {
+[data-ui-variant="github"] .metrics-tree fluent-tree-item:hover::part(positioning-region) {
     background: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
 }
 
-.metrics-tree > fluent-tree-item > .treeitem-text {
+[data-ui-variant="github"] .metrics-tree > fluent-tree-item > .treeitem-text {
     font-weight: 600;
 }
 
@@ -287,17 +287,17 @@ fluent-tab[aria-selected="true"] svg {
     Interaction idioms to match GitHub: links underline on hover (they are underline-none at rest),
     and interactive controls show a consistent 2px accent focus ring on keyboard focus.
 */
-.fluent-data-grid-row a:hover,
-a.fluent-anchor:hover,
-.link:hover {
+[data-ui-variant="github"] .fluent-data-grid-row a:hover,
+[data-ui-variant="github"] a.fluent-anchor:hover,
+[data-ui-variant="github"] .link:hover {
     text-decoration: underline;
     text-underline-offset: 2px;
 }
 
-fluent-button:focus-visible::part(control),
-fluent-anchor:focus-visible::part(control),
-fluent-tab:focus-visible,
-.fluent-data-grid-row:focus-visible {
+[data-ui-variant="github"] fluent-button:focus-visible::part(control),
+[data-ui-variant="github"] fluent-anchor:focus-visible::part(control),
+[data-ui-variant="github"] fluent-tab:focus-visible,
+[data-ui-variant="github"] .fluent-data-grid-row:focus-visible {
     outline: 2px solid var(--accent-fill-rest);
     outline-offset: -1px;
     border-radius: 6px;
@@ -307,21 +307,21 @@ fluent-tab:focus-visible,
     NavList: give the left navigation a Primer feel. Selected item gets a subtle rounded highlight
     with the accent, and hover gets a quiet rounded background. Markup is unchanged.
 */
-.fluent-appbar-item .fluentui-counterbadge-container > a {
+[data-ui-variant="github"] .fluent-appbar-item .fluentui-counterbadge-container > a {
     border-radius: var(--gh-nav-radius, 6px);
     transition: background-color 0.12s var(--gh-ease, ease);
 }
 
-.fluent-appbar-item .fluentui-counterbadge-container > a:hover {
+[data-ui-variant="github"] .fluent-appbar-item .fluentui-counterbadge-container > a:hover {
     background-color: var(--neutral-fill-stealth-hover, rgba(129, 139, 152, 0.10));
 }
 
-.fluent-appbar-item .fluentui-counterbadge-container > a.active {
+[data-ui-variant="github"] .fluent-appbar-item .fluentui-counterbadge-container > a.active {
     background-color: var(--accent-fill-rest);
     background-color: color-mix(in srgb, var(--accent-fill-rest) 12%, transparent);
 }
 
-.fluent-appbar-item .fluentui-counterbadge-container > a.active [part="label"] {
+[data-ui-variant="github"] .fluent-appbar-item .fluentui-counterbadge-container > a.active [part="label"] {
     font-weight: 600;
     color: var(--accent-foreground-rest);
 }

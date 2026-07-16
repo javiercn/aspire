@@ -17,6 +17,7 @@ const currentThemeCookieName = "currentTheme";
 const themeSettingDark = "Dark";
 const themeSettingLight = "Light";
 const darkThemeLuminance = 0.15;
+const fluentDarkThemeLuminance = 0.19;
 const lightThemeLuminance = 1.0;
 const darknessLuminanceTarget = (-0.1 + Math.sqrt(0.21)) / 2;
 
@@ -43,6 +44,10 @@ export function getThemeCookieValue() {
 
 export function getCurrentTheme() {
     return getEffectiveTheme(getThemeCookieValue());
+}
+
+function useGitHubVariant() {
+    return document.documentElement.getAttribute('data-ui-variant') !== 'fluent';
 }
 
 /**
@@ -137,7 +142,7 @@ function getEffectiveTheme(specifiedTheme) {
  */
 function getBaseLayerLuminanceForTheme(theme) {
     if (theme === themeSettingDark) {
-        return darkThemeLuminance;
+        return useGitHubVariant() ? darkThemeLuminance : fluentDarkThemeLuminance;
     } else /* Light */ {
         return lightThemeLuminance;
     }
@@ -147,6 +152,19 @@ function getBaseLayerLuminanceForTheme(theme) {
  * Configures the accent color palette to match the GitHub Copilot look.
  */
 function setAccentColor() {
+    if (!useGitHubVariant()) {
+        // #512BD4 (classic .NET purple)
+        const baseColor = {
+            r: 0x51 / 255.0,
+            g: 0x2B / 255.0,
+            b: 0xD4 / 255.0
+        };
+
+        const accentBase = SwatchRGB.create(baseColor.r, baseColor.g, baseColor.b);
+        accentBaseColor.withDefault(accentBase);
+        return;
+    }
+
     // Convert the base color ourselves to avoid pulling in the
     // @microsoft/fast-colors library just for one call to parseColorHexRGB
     const baseColor = { // #0969DA (GitHub Primer accent blue)
@@ -169,6 +187,12 @@ function setAccentColor() {
  * updateNeutralBaseColor takes a hex string.
  */
 function setNeutralColor(theme) {
+    if (!useGitHubVariant()) {
+        // Fluent keeps the neutral ramp gray in both light and dark themes.
+        updateNeutralBaseColor("#808080");
+        return;
+    }
+
     if (theme === themeSettingDark) {
         updateNeutralBaseColor("#818b98");
     } else {
@@ -180,6 +204,14 @@ function setNeutralColor(theme) {
  * Aligns control/surface radii and the body font with GitHub Primer.
  */
 function setControlDefaults() {
+    if (!useGitHubVariant()) {
+        // Fluent keeps the classic control radius and Segoe font stack.
+        controlCornerRadius.withDefault(4);
+        layerCornerRadius.withDefault(8);
+        bodyFont.withDefault('"Segoe UI Variable", "Segoe UI", sans-serif');
+        return;
+    }
+
     // GitHub uses ~6px radius on controls (buttons/inputs) and ~8px on surfaces.
     controlCornerRadius.withDefault(6);
     layerCornerRadius.withDefault(8);
