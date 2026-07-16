@@ -1,0 +1,8 @@
+{
+  "name": "dashboard-visual-dev-loop",
+  "private": true,
+  "description": "Playwright harness for capturing and validating the Aspire Dashboard UI.",
+  "dependencies": {
+    "playwright": "^1.47.0"
+  }
+}
