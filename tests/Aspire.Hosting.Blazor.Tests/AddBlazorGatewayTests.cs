@@ -14,7 +14,7 @@ namespace Aspire.Hosting.Blazor.Tests;
 public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 {
     private const string GatewayPackageId = "Microsoft.AspNetCore.Components.Gateway.Cli";
-    private const string GatewayPackageVersion = "11.0.0-preview.7.26381.103";
+    private const string GatewayPackageVersion = "11.0.0-rc.1.26425.128";
 
     [Fact]
     public void AddBlazorGateway_PreservesProjectResourceApiAndUsesToolForRunMode()
@@ -71,14 +71,13 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 
     [Theory]
     [InlineData("10.0.201", false)]
-    [InlineData("11.0.100-preview.6.26359.118", false)]
-    [InlineData("11.0.100-preview.7.26381.103", true)]
-    [InlineData("11.0.100-preview.8.26400.1", true)]
-    [InlineData("11.0.100-rc.1.26400.1", true)]
+    [InlineData("11.0.100-preview.7.26381.103", false)]
+    [InlineData("11.0.100-rc.1.26425.128", true)]
+    [InlineData("11.0.100-rc.2.26450.1", true)]
     [InlineData("11.0.100", true)]
     [InlineData("12.0.100-preview.1.27000.1", true)]
     [InlineData("invalid", false)]
-    public void IsCompatibleDotnetSdkVersion_RequiresNet11Preview7OrLater(string version, bool expected)
+    public void IsCompatibleDotnetSdkVersion_RequiresNet11Rc1OrLater(string version, bool expected)
     {
         Assert.Equal(expected, BlazorGatewayExtensions.IsCompatibleDotnetSdkVersion(version));
     }
@@ -104,16 +103,71 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 
         var dockerfile = await build.DockerfileFactory(context);
 
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build", dockerfile);
+        Assert.Contains("FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build", dockerfile);
         Assert.Contains("COPY Gateway.cs .", dockerfile);
         Assert.Contains("RUN dotnet publish Gateway.cs -c Release -o /app/publish", dockerfile);
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/aspnet:10.0", dockerfile);
+        Assert.Contains("FROM mcr.microsoft.com/dotnet/aspnet:11.0", dockerfile);
         Assert.Contains("COPY --from=build /app/publish .", dockerfile);
         Assert.Contains("ENTRYPOINT [\"dotnet\",\"Gateway.dll\"]", dockerfile);
         Assert.DoesNotContain(GatewayPackageId, dockerfile);
 
         Assert.Empty(gateway.Resource.Annotations.OfType<ProjectLaunchArgsOverrideAnnotation>());
         Assert.Empty(gateway.Resource.Annotations.OfType<ExecutableAnnotation>());
+    }
+
+    [Fact]
+    public void BlazorWasmPublishCompanion_UsesNet11Sdk()
+    {
+        var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
+            "Blazor/Blazor.csproj",
+            ".aspire/scripts/PrefixEndpoints.cs",
+            "app",
+            BlazorGatewayExtensions.GetBlazorWasmSdkImageTag("net11.0"));
+
+        Assert.StartsWith("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
+        Assert.Contains("RUN dotnet publish \"Blazor/Blazor.csproj\" -c Release -o /app/publish", dockerfile);
+    }
+
+    [Theory]
+    [InlineData("net8.0", "11.0")]
+    [InlineData("net10.0", "11.0")]
+    [InlineData("net11.0", "11.0.100-rc.1")]
+    public void GetBlazorWasmSdkImageTag_SelectsCompatibleSdk(string targetFramework, string expected)
+    {
+        Assert.Equal(expected, BlazorGatewayExtensions.GetBlazorWasmSdkImageTag(targetFramework));
+    }
+
+    [Fact]
+    public void GetSolutionRoot_UsesNearestSolutionAncestor()
+    {
+        var solutionRoot = Directory.CreateTempSubdirectory();
+        try
+        {
+            File.WriteAllText(Path.Combine(solutionRoot.FullName, "Test.slnx"), "<Solution />");
+            var appHostDirectory = Directory.CreateDirectory(Path.Combine(solutionRoot.FullName, "src", "AppHost")).FullName;
+
+            Assert.Equal(solutionRoot.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory));
+        }
+        finally
+        {
+            solutionRoot.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public void GetSolutionRoot_WithoutSolution_UsesAppHostParent()
+    {
+        var directory = Directory.CreateTempSubdirectory();
+        try
+        {
+            var appHostDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "AppHost")).FullName;
+
+            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
     }
 
     [Fact]

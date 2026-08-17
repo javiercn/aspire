@@ -71,6 +71,7 @@
   <!-- .NET 11.0 Package Versions used by project templates -->
   <PropertyGroup Label="Net11Preview">
     <MicrosoftAspNetCoreComponentsGatewayCliNet11Version>11.0.0-rc.1.26425.128</MicrosoftAspNetCoreComponentsGatewayCliNet11Version>
+    <MicrosoftAspNetCoreComponentsWebAssemblyNet11Version>11.0.0-rc.1.26425.128</MicrosoftAspNetCoreComponentsWebAssemblyNet11Version>
     <MicrosoftAspNetCoreAuthenticationCertificateNet11Version>11.0.0-rc.1.26425.128</MicrosoftAspNetCoreAuthenticationCertificateNet11Version>
     <MicrosoftAspNetCoreAuthenticationOpenIdConnectNet11Version>11.0.0-rc.1.26425.128</MicrosoftAspNetCoreAuthenticationOpenIdConnectNet11Version>
     <MicrosoftAspNetCoreOpenApiNet11Version>11.0.0-rc.1.26425.128</MicrosoftAspNetCoreOpenApiNet11Version>
