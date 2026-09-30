@@ -153,14 +153,6 @@
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-aspnetcore</Uri>
       <Sha>324a351f7f1ae6c17b6a8661903e2a7921a7d75c</Sha>
     </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.Components.Gateway.Cli" Version="11.0.0-rc.1.26425.128">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>3551975be08744f0418857c5bed8ab1545c5dd47</Sha>
-    </Dependency>
-    <Dependency Name="Microsoft.AspNetCore.Components.WebAssembly" Version="11.0.0-rc.1.26425.128">
-      <Uri>https://github.com/dotnet/dotnet</Uri>
-      <Sha>3551975be08744f0418857c5bed8ab1545c5dd47</Sha>
-    </Dependency>
     <Dependency Name="Microsoft.Extensions.Caching.Memory" Version="9.0.14">
       <Uri>https://dev.azure.com/dnceng/internal/_git/dotnet-runtime</Uri>
       <Sha>19c07820cb72aafc554c3bc8fe3c54010f5123f0</Sha>
