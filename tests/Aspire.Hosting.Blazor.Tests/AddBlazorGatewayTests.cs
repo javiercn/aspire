@@ -121,22 +121,12 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
             "Blazor/Blazor.csproj",
             ".aspire/scripts/PrefixEndpoints.cs",
-            "app",
-            BlazorGatewayExtensions.GetBlazorWasmSdkImageTag("net11.0"));
+            "app");
 
         Assert.StartsWith("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
         Assert.Contains("WORKDIR /src/Blazor", dockerfile);
         Assert.Contains("RUN dotnet publish \"Blazor.csproj\" -c Release -o /app/publish", dockerfile);
         Assert.Contains("dotnet run \"/src/.aspire/scripts/PrefixEndpoints.cs\"", dockerfile);
-    }
-
-    [Theory]
-    [InlineData("net8.0", "11.0.100-rc.1")]
-    [InlineData("net10.0", "11.0.100-rc.1")]
-    [InlineData("net11.0", "11.0.100-rc.1")]
-    public void GetBlazorWasmSdkImageTag_SelectsCompatibleSdk(string targetFramework, string expected)
-    {
-        Assert.Equal(expected, BlazorGatewayExtensions.GetBlazorWasmSdkImageTag(targetFramework));
     }
 
     [Fact]

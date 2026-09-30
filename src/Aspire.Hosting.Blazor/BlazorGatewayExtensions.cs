@@ -26,9 +26,8 @@ namespace Aspire.Hosting;
 public static class BlazorGatewayExtensions
 {
     private static readonly string s_blazorGatewayCliVersion = GetAssemblyMetadataValue("BlazorGatewayCliVersion");
-    private static readonly string s_blazorGatewaySdkImageTag = GetAssemblyMetadataValue("BlazorGatewaySdkImageTag");
+    private static readonly string s_blazorSdkImageTag = GetAssemblyMetadataValue("BlazorSdkImageTag");
     private static readonly string s_blazorGatewayAspNetImageTag = GetAssemblyMetadataValue("BlazorGatewayAspNetImageTag");
-    private static readonly string s_blazorWasmSdkImageTag = GetAssemblyMetadataValue("BlazorWasmSdkImageTag");
     private const string DotNetSdkImageRepo = "mcr.microsoft.com/dotnet/sdk";
     private const string DotNetAspNetImageRepo = "mcr.microsoft.com/dotnet/aspnet";
     private const string BlazorGatewayCliPackageId = "Microsoft.AspNetCore.Components.Gateway.Cli";
@@ -96,7 +95,7 @@ public static class BlazorGatewayExtensions
                     var logger = ctx.Services.GetService<ILogger<BlazorWasmAppResource>>();
 
                     ctx.Builder
-                        .From($"{DotNetSdkImageRepo}:{s_blazorGatewaySdkImageTag}", "build")
+                        .From($"{DotNetSdkImageRepo}:{s_blazorSdkImageTag}", "build")
                         .WorkDir("/src")
                         .Copy("Gateway.cs", ".")
                         .Run("dotnet publish Gateway.cs -c Release -o /app/publish");
@@ -607,20 +606,9 @@ public static class BlazorGatewayExtensions
             .WithImage("placeholder")
             .WithContainerFilesSource("/app/output");
 
-        companion.WithDockerfileFactory(project.SolutionRoot, async context =>
-        {
-            ILogger logger = context.Services.GetService<ILogger<BlazorWasmAppResource>>() is { } typedLogger
-                ? typedLogger
-                : Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-            var targetFramework = await BlazorWasmAppBuilder.GetTargetFrameworkAsync(
-                wasmApp.Resource.ProjectPath,
-                logger,
-                context.CancellationToken).ConfigureAwait(false)
-                ?? throw new InvalidOperationException($"Unable to determine the target framework for '{wasmApp.Resource.ProjectPath}'.");
-
-            var sdkImageTag = GetBlazorWasmSdkImageTag(targetFramework);
-            return BuildBlazorWasmPublishDockerfile(relativeProjectPath, scriptRelativePath, pathPrefix, sdkImageTag);
-        });
+        companion.WithDockerfileFactory(
+            project.SolutionRoot,
+            _ => BuildBlazorWasmPublishDockerfile(relativeProjectPath, scriptRelativePath, pathPrefix));
 
         gateway.WithAnnotation(new ContainerFilesDestinationAnnotation
         {
@@ -632,8 +620,7 @@ public static class BlazorGatewayExtensions
     internal static string BuildBlazorWasmPublishDockerfile(
         string relativeProjectPath,
         string scriptRelativePath,
-        string pathPrefix,
-        string sdkImageTag)
+        string pathPrefix)
     {
         var projectDirectory = Path.GetDirectoryName(relativeProjectPath)?.Replace('\\', '/');
         var projectFileName = Path.GetFileName(relativeProjectPath);
@@ -642,7 +629,7 @@ public static class BlazorGatewayExtensions
             : $"/src/{projectDirectory}";
 
         return $$"""
-            FROM {{DotNetSdkImageRepo}}:{{sdkImageTag}} AS build
+            FROM {{DotNetSdkImageRepo}}:{{s_blazorSdkImageTag}} AS build
             WORKDIR /src
             COPY . .
             WORKDIR {{containerProjectDirectory}}
@@ -656,13 +643,6 @@ public static class BlazorGatewayExtensions
                     {{pathPrefix}} \
                     /app/output/{{pathPrefix}}.endpoints.json
             """;
-    }
-
-    internal static string GetBlazorWasmSdkImageTag(string targetFramework)
-    {
-        return targetFramework.StartsWith("net11.", StringComparison.OrdinalIgnoreCase)
-            ? s_blazorWasmSdkImageTag
-            : s_blazorGatewaySdkImageTag;
     }
 
     private static string GetScriptPath(string scriptName)

@@ -4,8 +4,6 @@
   <!-- Pin the .NET 11 RC1 packages that provide the SDK-generated SPA fallback contract. -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MicrosoftAspNetCoreComponentsWebAssemblyNet11Version)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="$(MicrosoftAspNetCoreComponentsWebAssemblyNet11Version)" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="$(MicrosoftAspNetCoreComponentsWebAssemblyNet11Version)" />
     <PackageVersion Update="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
     <PackageVersion Update="OpenTelemetry.Extensions.Hosting" Version="1.19.1" />
     <PackageVersion Update="OpenTelemetry.Instrumentation.Http" Version="1.19.0" />
