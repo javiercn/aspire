@@ -125,7 +125,9 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
             BlazorGatewayExtensions.GetBlazorWasmSdkImageTag("net11.0"));
 
         Assert.StartsWith("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
-        Assert.Contains("RUN dotnet publish \"Blazor/Blazor.csproj\" -c Release -o /app/publish", dockerfile);
+        Assert.Contains("WORKDIR /src/Blazor", dockerfile);
+        Assert.Contains("RUN dotnet publish \"Blazor.csproj\" -c Release -o /app/publish", dockerfile);
+        Assert.Contains("dotnet run \"/src/.aspire/scripts/PrefixEndpoints.cs\"", dockerfile);
     }
 
     [Theory]
@@ -146,7 +148,9 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
             File.WriteAllText(Path.Combine(solutionRoot.FullName, "Test.slnx"), "<Solution />");
             var appHostDirectory = Directory.CreateDirectory(Path.Combine(solutionRoot.FullName, "src", "AppHost")).FullName;
 
-            Assert.Equal(solutionRoot.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory));
+            var projectDirectory = Directory.CreateDirectory(Path.Combine(solutionRoot.FullName, "src", "Client")).FullName;
+
+            Assert.Equal(solutionRoot.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
         }
         finally
         {
@@ -162,7 +166,27 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         {
             var appHostDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "AppHost")).FullName;
 
-            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory));
+            var projectDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "Client")).FullName;
+
+            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
+    }
+
+    [Fact]
+    public void GetSolutionRoot_SkipsSolutionThatDoesNotContainProject()
+    {
+        var directory = Directory.CreateTempSubdirectory();
+        try
+        {
+            var appHostDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "AppHost")).FullName;
+            File.WriteAllText(Path.Combine(appHostDirectory, "AppHost.slnx"), "<Solution />");
+            var projectDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "Client")).FullName;
+
+            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
         }
         finally
         {

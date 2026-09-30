@@ -412,24 +412,46 @@ public static class BlazorGatewayExtensions
     private static ProjectInfo GetProjectInfo(string projectPath, string appHostDirectory)
     {
         var projectDir = Path.GetDirectoryName(projectPath)!;
-        var solutionRoot = GetSolutionRoot(appHostDirectory);
+        var solutionRoot = GetSolutionRoot(appHostDirectory, projectDir);
         var relativeProjectPath = Path.GetRelativePath(solutionRoot, projectDir)
             .Replace('\\', '/');
         return new ProjectInfo(solutionRoot, relativeProjectPath);
     }
 
-    internal static string GetSolutionRoot(string appHostDirectory)
+    internal static string GetSolutionRoot(string appHostDirectory, string projectDirectory)
     {
         for (var directory = new DirectoryInfo(appHostDirectory); directory is not null; directory = directory.Parent)
         {
-            if (directory.EnumerateFiles("*.sln", SearchOption.TopDirectoryOnly).Any()
-                || directory.EnumerateFiles("*.slnx", SearchOption.TopDirectoryOnly).Any())
+            if (ContainsPath(directory.FullName, projectDirectory)
+                && (directory.EnumerateFiles("*.sln", SearchOption.TopDirectoryOnly).Any()
+                    || directory.EnumerateFiles("*.slnx", SearchOption.TopDirectoryOnly).Any()))
             {
                 return directory.FullName;
             }
         }
 
-        return Path.GetFullPath(Path.Combine(appHostDirectory, ".."));
+        var appHostAncestors = new HashSet<string>(
+            EnumerateAncestors(appHostDirectory),
+            OperatingSystem.IsWindows() ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+        return EnumerateAncestors(projectDirectory)
+            .First(appHostAncestors.Contains);
+
+        static bool ContainsPath(string parentPath, string childPath)
+        {
+            var relativePath = Path.GetRelativePath(parentPath, childPath);
+            return !Path.IsPathRooted(relativePath)
+                && relativePath != ".."
+                && !relativePath.StartsWith($"..{Path.DirectorySeparatorChar}", StringComparison.Ordinal);
+        }
+
+        static IEnumerable<string> EnumerateAncestors(string path)
+        {
+            for (var directory = new DirectoryInfo(path); directory is not null; directory = directory.Parent)
+            {
+                yield return directory.FullName;
+            }
+        }
     }
 
     private static void MirrorGatewayStateToClients<TGateway>(IResourceBuilder<TGateway> gateway)
@@ -612,16 +634,23 @@ public static class BlazorGatewayExtensions
         string pathPrefix,
         string sdkImageTag)
     {
+        var projectDirectory = Path.GetDirectoryName(relativeProjectPath)?.Replace('\\', '/');
+        var projectFileName = Path.GetFileName(relativeProjectPath);
+        var containerProjectDirectory = string.IsNullOrEmpty(projectDirectory)
+            ? "/src"
+            : $"/src/{projectDirectory}";
+
         return $$"""
             FROM {{DotNetSdkImageRepo}}:{{sdkImageTag}} AS build
             WORKDIR /src
             COPY . .
-            RUN dotnet publish "{{relativeProjectPath}}" -c Release -o /app/publish
+            WORKDIR {{containerProjectDirectory}}
+            RUN dotnet publish "{{projectFileName}}" -c Release -o /app/publish
 
             # Prefix asset paths and add SPA fallback endpoint
             RUN mkdir -p /app/output/wwwroot/{{pathPrefix}} && \
                 cp -r /app/publish/wwwroot/* /app/output/wwwroot/{{pathPrefix}}/ && \
-                dotnet run "{{scriptRelativePath}}" -- \
+                dotnet run "/src/{{scriptRelativePath}}" -- \
                     /app/publish/*.staticwebassets.endpoints.json \
                     {{pathPrefix}} \
                     /app/output/{{pathPrefix}}.endpoints.json
