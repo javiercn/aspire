@@ -12,7 +12,8 @@
   <PropertyGroup>
     <MinCodeCoverage>0</MinCodeCoverage>
     <EnablePackageValidation>false</EnablePackageValidation>
-    <BlazorGatewayDotNetImageTag>11.0</BlazorGatewayDotNetImageTag>
+    <BlazorGatewaySdkImageTag>11.0.100-rc.1</BlazorGatewaySdkImageTag>
+    <BlazorGatewayAspNetImageTag>11.0.0-rc.1</BlazorGatewayAspNetImageTag>
     <BlazorWasmSdkImageTag>11.0.100-rc.1</BlazorWasmSdkImageTag>
   </PropertyGroup>
 
@@ -22,8 +23,12 @@
       <_Parameter2>$(MicrosoftAspNetCoreComponentsGatewayCliNet11Version)</_Parameter2>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
-      <_Parameter1>BlazorGatewayDotNetImageTag</_Parameter1>
-      <_Parameter2>$(BlazorGatewayDotNetImageTag)</_Parameter2>
+      <_Parameter1>BlazorGatewaySdkImageTag</_Parameter1>
+      <_Parameter2>$(BlazorGatewaySdkImageTag)</_Parameter2>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
+      <_Parameter1>BlazorGatewayAspNetImageTag</_Parameter1>
+      <_Parameter2>$(BlazorGatewayAspNetImageTag)</_Parameter2>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute">
       <_Parameter1>BlazorWasmSdkImageTag</_Parameter1>

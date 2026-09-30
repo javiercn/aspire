@@ -103,10 +103,10 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 
         var dockerfile = await build.DockerfileFactory(context);
 
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/sdk:11.0 AS build", dockerfile);
+        Assert.Contains("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
         Assert.Contains("COPY Gateway.cs .", dockerfile);
         Assert.Contains("RUN dotnet publish Gateway.cs -c Release -o /app/publish", dockerfile);
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/aspnet:11.0", dockerfile);
+        Assert.Contains("FROM mcr.microsoft.com/dotnet/aspnet:11.0.0-rc.1", dockerfile);
         Assert.Contains("COPY --from=build /app/publish .", dockerfile);
         Assert.Contains("ENTRYPOINT [\"dotnet\",\"Gateway.dll\"]", dockerfile);
         Assert.DoesNotContain(GatewayPackageId, dockerfile);
@@ -131,8 +131,8 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
     }
 
     [Theory]
-    [InlineData("net8.0", "11.0")]
-    [InlineData("net10.0", "11.0")]
+    [InlineData("net8.0", "11.0.100-rc.1")]
+    [InlineData("net10.0", "11.0.100-rc.1")]
     [InlineData("net11.0", "11.0.100-rc.1")]
     public void GetBlazorWasmSdkImageTag_SelectsCompatibleSdk(string targetFramework, string expected)
     {

@@ -26,7 +26,8 @@ namespace Aspire.Hosting;
 public static class BlazorGatewayExtensions
 {
     private static readonly string s_blazorGatewayCliVersion = GetAssemblyMetadataValue("BlazorGatewayCliVersion");
-    private static readonly string s_dotNetImageTag = GetDotNetImageTag();
+    private static readonly string s_blazorGatewaySdkImageTag = GetAssemblyMetadataValue("BlazorGatewaySdkImageTag");
+    private static readonly string s_blazorGatewayAspNetImageTag = GetAssemblyMetadataValue("BlazorGatewayAspNetImageTag");
     private static readonly string s_blazorWasmSdkImageTag = GetAssemblyMetadataValue("BlazorWasmSdkImageTag");
     private const string DotNetSdkImageRepo = "mcr.microsoft.com/dotnet/sdk";
     private const string DotNetAspNetImageRepo = "mcr.microsoft.com/dotnet/aspnet";
@@ -95,7 +96,7 @@ public static class BlazorGatewayExtensions
                     var logger = ctx.Services.GetService<ILogger<BlazorWasmAppResource>>();
 
                     ctx.Builder
-                        .From($"{DotNetSdkImageRepo}:{s_dotNetImageTag}", "build")
+                        .From($"{DotNetSdkImageRepo}:{s_blazorGatewaySdkImageTag}", "build")
                         .WorkDir("/src")
                         .Copy("Gateway.cs", ".")
                         .Run("dotnet publish Gateway.cs -c Release -o /app/publish");
@@ -103,7 +104,7 @@ public static class BlazorGatewayExtensions
                     ctx.Builder.AddContainerFilesStages(ctx.Resource, logger);
 
                     ctx.Builder
-                        .From($"{DotNetAspNetImageRepo}:{s_dotNetImageTag}")
+                        .From($"{DotNetAspNetImageRepo}:{s_blazorGatewayAspNetImageTag}")
                         .WorkDir("/app")
                         .CopyFrom("build", "/app/publish", ".")
                         .AddContainerFiles(ctx.Resource, "/app", logger)
@@ -661,7 +662,7 @@ public static class BlazorGatewayExtensions
     {
         return targetFramework.StartsWith("net11.", StringComparison.OrdinalIgnoreCase)
             ? s_blazorWasmSdkImageTag
-            : s_dotNetImageTag;
+            : s_blazorGatewaySdkImageTag;
     }
 
     private static string GetScriptPath(string scriptName)
@@ -860,65 +861,6 @@ public static class BlazorGatewayExtensions
     {
         public string SolutionRoot { get; } = solutionRoot;
         public string RelativeProjectPath { get; } = relativeProjectPath;
-    }
-
-    /// <summary>
-    /// Resolves the Docker image tag for .NET base images. Uses the maximum of the build-time
-    /// stamped version and the actual runtime version, with pre-release suffix when applicable.
-    /// </summary>
-    private static string GetDotNetImageTag()
-    {
-        var runtimeMajor = Environment.Version.Major;
-        var runtimeMinor = Environment.Version.Minor;
-
-        var stampedMajor = runtimeMajor;
-        var stampedMinor = runtimeMinor;
-
-        var stampedValue = typeof(BlazorGatewayExtensions).Assembly
-            .GetCustomAttributes(typeof(System.Reflection.AssemblyMetadataAttribute), inherit: false)
-            .OfType<System.Reflection.AssemblyMetadataAttribute>()
-            .FirstOrDefault(a => a.Key == "BlazorGatewayDotNetImageTag")
-            ?.Value;
-
-        if (!string.IsNullOrEmpty(stampedValue))
-        {
-            var parts = stampedValue.Split('.');
-            if (parts.Length >= 2
-                && int.TryParse(parts[0], out var sMajor)
-                && int.TryParse(parts[1], out var sMinor))
-            {
-                stampedMajor = sMajor;
-                stampedMinor = sMinor;
-            }
-        }
-
-        var major = Math.Max(runtimeMajor, stampedMajor);
-        var minor = (major == runtimeMajor && major == stampedMajor)
-            ? Math.Max(runtimeMinor, stampedMinor)
-            : (major == runtimeMajor ? runtimeMinor : stampedMinor);
-
-        var tag = $"{major}.{minor}";
-
-        // Append pre-release suffix when the runtime version won and is pre-release.
-        if (major == runtimeMajor && minor == runtimeMinor)
-        {
-            var informationalVersion = (System.Reflection.AssemblyInformationalVersionAttribute?)
-                Attribute.GetCustomAttribute(typeof(object).Assembly, typeof(System.Reflection.AssemblyInformationalVersionAttribute));
-
-            if (informationalVersion is not null)
-            {
-                if (informationalVersion.InformationalVersion.Contains("-preview", StringComparison.OrdinalIgnoreCase))
-                {
-                    tag += "-preview";
-                }
-                else if (informationalVersion.InformationalVersion.Contains("-rc", StringComparison.OrdinalIgnoreCase))
-                {
-                    tag += "-rc";
-                }
-            }
-        }
-
-        return tag;
     }
 
     private static string GetAssemblyMetadataValue(string key)
