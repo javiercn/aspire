@@ -4,6 +4,12 @@ This sample demonstrates how to integrate a **standalone Blazor WebAssembly** ap
 
 During local development, the gateway runs from the official .NET tool and requires the .NET 11 SDK or later. The sample workloads target .NET 11, and the standalone client enables the SDK's `StaticWebAssetSpaFallbackEnabled` fallback generation. Publishing continues to use the generated file-based gateway.
 
+## Requirements
+
+- Development requires the .NET 11 SDK or later to run `Microsoft.AspNetCore.Components.Gateway.Cli`.
+- Publishing supports a Blazor WebAssembly client that targets one framework from .NET 8 through .NET 11. Multi-targeted clients and clients targeting .NET 12 or later aren't supported by the current publish image.
+- The AppHost and client projects must be under a common ancestor directory containing a `.sln` or `.slnx` file. Aspire uses that directory as the Docker build context.
+
 ## Overview
 
 For **standalone** Blazor WebAssembly applications, there is no server-side Blazor host. This sample uses the `Aspire.Hosting.Blazor` package to run the official Blazor **Gateway** (an ASP.NET Core + YARP reverse proxy) that:

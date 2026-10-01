@@ -36,6 +36,13 @@ public static class BlazorGatewayExtensions
     /// During development the gateway runs from the official .NET tool. Publishing continues
     /// to use the file-based app shipped with this package.
     /// </summary>
+    /// <remarks>
+    /// Development requires a .NET SDK compatible with the configured gateway tool package.
+    /// When publishing attached Blazor WebAssembly apps, each client must target a single framework
+    /// supported by the SDK image used by this package. The AppHost and client projects must also
+    /// be contained by a common ancestor directory with a <c>.sln</c> or <c>.slnx</c> file; that
+    /// directory is used as the Docker build context.
+    /// </remarks>
     [AspireExport]
     public static IResourceBuilder<ProjectResource> AddBlazorGateway(
         this IDistributedApplicationBuilder builder,
@@ -81,9 +88,13 @@ public static class BlazorGatewayExtensions
     /// <summary>
     /// Registers the built-in Blazor Gateway backed by an experimental <see cref="DotnetProjectResource"/>
     /// from <c>Aspire.Hosting.Dotnet</c> (the run/watch-capable .NET resource), rather than the
-    /// <see cref="ProjectResource"/> used by <see cref="AddBlazorGateway"/>. The gateway is shipped as
-    /// Gateway.cs alongside this library and launched via <c>AddDotnetProject</c>. No separate project is needed.
+    /// <see cref="ProjectResource"/> used by <see cref="AddBlazorGateway"/>.
     /// </summary>
+    /// <remarks>
+    /// During development, the gateway runs from the official .NET tool. Publishing uses the
+    /// file-based <c>Gateway.cs</c> app shipped with this package. The development and publish
+    /// prerequisites are the same as for <see cref="AddBlazorGateway"/>.
+    /// </remarks>
     /// <param name="builder">The distributed application builder.</param>
     /// <param name="name">The name of the gateway resource.</param>
     /// <returns>A reference to the <see cref="IResourceBuilder{T}"/> for the gateway resource.</returns>
@@ -227,6 +238,9 @@ public static class BlazorGatewayExtensions
     /// <param name="apiPrefix">The URL path prefix for API proxy routes. Defaults to <c>"_api"</c>.</param>
     /// <param name="otlpPrefix">The URL path prefix for OTLP proxy routes. Defaults to <c>"_otlp"</c>.</param>
     /// <param name="proxyTelemetry"><see langword="true"/> to expose the OTLP proxy for the client app; otherwise, <see langword="false"/>.</param>
+    /// <remarks>
+    /// For development and publish prerequisites, see <see cref="AddBlazorGateway"/>.
+    /// </remarks>
     [AspireExport]
     public static IResourceBuilder<ProjectResource> WithBlazorClientApp(
         this IResourceBuilder<ProjectResource> gateway,
@@ -257,6 +271,9 @@ public static class BlazorGatewayExtensions
     /// <ats-param name="otlpPrefix">The URL path prefix for telemetry proxy routes. The default is <c>"_otlp"</c>.</ats-param>
     /// <ats-param name="proxyTelemetry"><see langword="true"/> to expose the telemetry proxy for the client app; otherwise, <see langword="false"/>.</ats-param>
     /// <ats-returns>The gateway resource builder.</ats-returns>
+    /// <remarks>
+    /// For development and publish prerequisites, see <see cref="AddBlazorGateway"/>.
+    /// </remarks>
     [AspireExport("withDotnetProjectBlazorClientApp", MethodName = "withBlazorClientApp")]
     public static IResourceBuilder<DotnetProjectResource> WithBlazorClientApp(
         this IResourceBuilder<DotnetProjectResource> gateway,
