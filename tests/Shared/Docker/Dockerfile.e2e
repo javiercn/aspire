@@ -1,6 +1,6 @@
 # Multi-stage Dockerfile for Aspire E2E testing (.NET variant).
 #
-# Includes: .NET SDK 11.0 RC1, Docker CLI (via host socket mount), gh CLI,
+# Includes: .NET SDK 10.0, Docker CLI (via host socket mount), gh CLI,
 #           jq, Node.js, Python, Aspire install scripts.
 #
 # Usage:
@@ -17,7 +17,7 @@
 # ============================================================
 # Produces NuGet packages and the native AOT CLI binary.
 # Skipped when SKIP_SOURCE_BUILD=true (CI mode).
-FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 
 ARG SKIP_SOURCE_BUILD=false
 ARG UBUNTU_APT_MIRROR=
@@ -48,7 +48,7 @@ RUN if [ "$SKIP_SOURCE_BUILD" != "true" ]; then \
 # ============================================================
 # Stage 2: .NET test runtime environment
 # ============================================================
-FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS runtime
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS runtime
 
 ARG UBUNTU_APT_MIRROR=
 
