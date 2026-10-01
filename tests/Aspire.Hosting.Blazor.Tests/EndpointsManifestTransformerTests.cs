@@ -93,6 +93,13 @@ public class EndpointsManifestTransformerTests : IDisposable
                 },
                 new EndpointEntry
                 {
+                    Route = "index.html",
+                    AssetFile = "index.html.gz",
+                    Selectors = [new EndpointSelector { Name = "Content-Encoding" }],
+                    ResponseHeaders = [new EndpointResponseHeader { Name = "Cache-Control", Value = "max-age=3600" }]
+                },
+                new EndpointEntry
+                {
                     Route = "{**fallback:nonfile}",
                     AssetFile = "index.html",
                     ExtensionData = new Dictionary<string, JsonElement>
@@ -125,6 +132,11 @@ public class EndpointsManifestTransformerTests : IDisposable
             {
                 Assert.Equal("index.html", endpoint.Route);
                 Assert.Equal("store/index.html", endpoint.AssetFile);
+            },
+            endpoint =>
+            {
+                Assert.Equal("index.html", endpoint.Route);
+                Assert.Equal("store/index.html.gz", endpoint.AssetFile);
             },
             fallback =>
             {
@@ -172,7 +184,16 @@ public class EndpointsManifestTransformerTests : IDisposable
             Endpoints =
             [
                 new EndpointEntry { Route = "css/app.css", AssetFile = "css/app.css" },
-                new EndpointEntry { Route = "_framework/blazor.webassembly.js", AssetFile = "_framework/blazor.webassembly.js" }
+                new EndpointEntry { Route = "_framework/blazor.webassembly.js", AssetFile = "_framework/blazor.webassembly.js" },
+                new EndpointEntry
+                {
+                    Route = "{**custom:nonfile}",
+                    AssetFile = "index.html.backup",
+                    ExtensionData = new Dictionary<string, JsonElement>
+                    {
+                        ["Order"] = JsonSerializer.SerializeToElement(int.MaxValue.ToString(CultureInfo.InvariantCulture))
+                    }
+                }
             ]
         };
 
@@ -186,6 +207,7 @@ public class EndpointsManifestTransformerTests : IDisposable
         // Routes should NOT be prefixed (MapGroup handles URL prefixing)
         Assert.Contains(transformed.Endpoints, ep => ep.Route == "css/app.css");
         Assert.Contains(transformed.Endpoints, ep => ep.Route == "_framework/blazor.webassembly.js");
+        Assert.Contains(transformed.Endpoints, ep => ep.Route == "{**custom:nonfile}");
     }
 
     [Fact]

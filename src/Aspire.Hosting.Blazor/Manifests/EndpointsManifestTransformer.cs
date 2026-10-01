@@ -28,8 +28,9 @@ internal static class EndpointsManifestTransformer
         // The .NET 11 manifest doesn't identify SPA fallbacks with endpoint metadata. Recognize the
         // SDK/legacy shape by combining the nonfile catch-all route with an index.html asset, then
         // replace every encoded variant with one prefixed identity fallback.
-        manifest.Endpoints = manifest.Endpoints
-            .Where(endpoint => !IsSpaFallbackEndpoint(endpoint))
+        var sourceEndpoints = manifest.Endpoints;
+        manifest.Endpoints = sourceEndpoints
+            .Where(endpoint => !IsSpaFallbackEndpoint(endpoint, sourceEndpoints))
             .ToArray();
 
         var fallbackEndpoints = new List<EndpointEntry>();
@@ -80,11 +81,16 @@ internal static class EndpointsManifestTransformer
         return JsonSerializer.Serialize(manifest, ManifestJsonContext.Relaxed.EndpointsManifest);
     }
 
-    private static bool IsSpaFallbackEndpoint(EndpointEntry endpoint)
+    private static bool IsSpaFallbackEndpoint(EndpointEntry endpoint, EndpointEntry[] endpoints)
     {
-        return endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
+        return endpoint.ExtensionData?.TryGetValue("Order", out var order) == true
+            && order.ValueKind == JsonValueKind.String
+            && order.GetString() == int.MaxValue.ToString(CultureInfo.InvariantCulture)
+            && endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
             && endpoint.Route.EndsWith(":nonfile}", StringComparison.Ordinal)
-            && Path.GetFileName(endpoint.AssetFile).StartsWith("index.html", StringComparison.OrdinalIgnoreCase);
+            && endpoints.Any(indexEndpoint =>
+                string.Equals(indexEndpoint.Route, "index.html", StringComparison.OrdinalIgnoreCase)
+                && string.Equals(indexEndpoint.AssetFile, endpoint.AssetFile, StringComparison.Ordinal));
     }
 
     /// <summary>

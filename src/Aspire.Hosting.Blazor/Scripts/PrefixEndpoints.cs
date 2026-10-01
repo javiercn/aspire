@@ -33,8 +33,9 @@ var manifest = JsonSerializer.Deserialize(
     File.ReadAllText(manifestPath),
     ManifestJsonContext.Default.EndpointsManifest)!;
 
-manifest.Endpoints = manifest.Endpoints
-    .Where(endpoint => !IsSpaFallbackEndpoint(endpoint))
+var sourceEndpoints = manifest.Endpoints;
+manifest.Endpoints = sourceEndpoints
+    .Where(endpoint => !IsSpaFallbackEndpoint(endpoint, sourceEndpoints))
     .ToArray();
 
 var fallbackEndpoints = new List<EndpointEntry>();
@@ -88,13 +89,18 @@ File.WriteAllText(outputPath, JsonSerializer.Serialize(manifest, ManifestJsonCon
 
 return 0;
 
-static bool IsSpaFallbackEndpoint(EndpointEntry endpoint)
+static bool IsSpaFallbackEndpoint(EndpointEntry endpoint, EndpointEntry[] endpoints)
 {
     // .NET 11 doesn't add explicit fallback metadata, so recognize the SDK/legacy shape by
     // combining the nonfile catch-all route with an index.html asset.
-    return endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
+    return endpoint.ExtensionData?.TryGetValue("Order", out var order) == true
+        && order.ValueKind == JsonValueKind.String
+        && order.GetString() == int.MaxValue.ToString(CultureInfo.InvariantCulture)
+        && endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
         && endpoint.Route.EndsWith(":nonfile}", StringComparison.Ordinal)
-        && Path.GetFileName(endpoint.AssetFile).StartsWith("index.html", StringComparison.OrdinalIgnoreCase);
+        && endpoints.Any(indexEndpoint =>
+            string.Equals(indexEndpoint.Route, "index.html", StringComparison.OrdinalIgnoreCase)
+            && string.Equals(indexEndpoint.AssetFile, endpoint.AssetFile, StringComparison.Ordinal));
 }
 
 // Same typed model used by the Hosting library's EndpointsManifestTransformer
