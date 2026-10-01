@@ -18,18 +18,15 @@
     <AspireProjectOrPackageReference Include="Aspire.Hosting" />
     <AspireProjectOrPackageReference Include="Aspire.Hosting.AppHost" />
     <AspireProjectOrPackageReference Include="Aspire.Hosting.Blazor" />
-    <AspireProjectOrPackageReference Include="Aspire.Hosting.Dotnet" />
-    <!-- Pin Http to the version used by Aspire.Hosting for this target framework. -->
+    <!-- AppHost runs on the repo's default target framework; pin Http to match Aspire.Hosting. -->
     <PackageReference Include="Microsoft.Extensions.Http" VersionOverride="$(MicrosoftExtensionsHttpPreviewVersion)" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\BlazorStandalone.WeatherApi\BlazorStandalone.WeatherApi.csproj"
-                      ReferenceOutputAssembly="false"
-                      SkipGetTargetFrameworkProperties="true" />
-    <ProjectReference Include="..\BlazorStandalone.TimeApi\BlazorStandalone.TimeApi.csproj"
-                      ReferenceOutputAssembly="false"
-                      SkipGetTargetFrameworkProperties="true" />
+    <ProjectReference Include="..\BlazorStandalone.WeatherApi\BlazorStandalone.WeatherApi.csproj" />
+    <ProjectReference Include="..\BlazorStandalone.TimeApi\BlazorStandalone.TimeApi.csproj" />
+    <!-- WASM project reference needed for IProjectMetadata discovery by AddBlazorWasmProject -->
+    <ProjectReference Include="..\BlazorStandalone\BlazorStandalone.csproj" />
   </ItemGroup>
 
 </Project>

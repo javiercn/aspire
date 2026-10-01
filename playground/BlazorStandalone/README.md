@@ -44,7 +44,7 @@ graph TB
 
 ### Step 1: AppHost Registers the WASM App and Gateway
 
-The `Aspire.Hosting.Blazor` package provides `AddBlazorWasmApp` and `AddBlazorGateway` APIs. The AppHost declares the WASM app, its service dependencies, and the gateway:
+The `Aspire.Hosting.Blazor` package provides `AddBlazorWasmProject` and `AddBlazorGateway` APIs. The AppHost declares the WASM app, its service dependencies, and the gateway:
 
 ```csharp
 var builder = DistributedApplication.CreateBuilder(args);
@@ -52,7 +52,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 var weatherApi = builder.AddProject<Projects.BlazorStandalone_WeatherApi>("weatherapi");
 
 // Register the WASM app — the resource name becomes the URL path prefix (e.g., /app/)
-var blazorApp = builder.AddBlazorWasmApp("app", "../BlazorStandalone/BlazorStandalone.csproj")
+var blazorApp = builder.AddBlazorWasmProject<Projects.BlazorStandalone>("app")
     .WithReference(weatherApi);
 
 // The Gateway serves WASM files and proxies API + OTLP traffic
@@ -174,7 +174,7 @@ await host.RunAsync();
 ```text
 BlazorStandalone/
 ├── BlazorStandalone.AppHost/           # Aspire orchestrator
-│   └── AppHost.cs                                # AddBlazorWasmApp + AddBlazorGateway
+│   └── AppHost.cs                                # AddBlazorWasmProject + AddBlazorGateway
 │
 ├── BlazorStandalone/                   # Standalone Blazor WASM client
 │   ├── Program.cs                                # AddEnvironmentVariables() + service discovery

@@ -2,9 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using Aspire.Hosting.ApplicationModel;
+using Aspire.Hosting.Dcp;
+using Aspire.Hosting.Dcp.Model;
 using Aspire.Hosting.Tests.Utils;
 using Aspire.Hosting.Utils;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging.Abstractions;
 
 #pragma warning disable ASPIREDOCKERFILEBUILDER001 // DockerfileBuilder is experimental
 #pragma warning disable ASPIREPROJECTS001 // ProjectLaunchArgsOverrideAnnotation is experimental
@@ -69,17 +72,14 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
             arg => Assert.Equal("--Logging:LogLevel:System.Net.Http.HttpClient.OtlpExporter=Warning", arg));
     }
 
-    [Theory]
-    [InlineData("10.0.201", false)]
-    [InlineData("11.0.100-preview.7.26381.103", false)]
-    [InlineData("11.0.100-rc.1.26425.128", true)]
-    [InlineData("11.0.100-rc.2.26450.1", true)]
-    [InlineData("11.0.100", true)]
-    [InlineData("12.0.100-preview.1.27000.1", true)]
-    [InlineData("invalid", false)]
-    public void IsCompatibleDotnetSdkVersion_RequiresNet11Rc1OrLater(string version, bool expected)
+    [Fact]
+    public async Task AddBlazorGateway_RendersCompleteProcessLaunchPlan()
     {
-        Assert.Equal(expected, BlazorGatewayExtensions.IsCompatibleDotnetSdkVersion(version));
+        using var builder = TestDistributedApplicationBuilder.Create(testOutputHelper);
+        var gateway = builder.AddBlazorGateway("gateway");
+        using var app = builder.Build();
+
+        await AssertGatewayProcessLaunchPlanAsync(gateway.Resource, builder, app.Services);
     }
 
     [Fact]
@@ -103,30 +103,72 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 
         var dockerfile = await build.DockerfileFactory(context);
 
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
-        Assert.Contains("COPY Gateway.cs .", dockerfile);
-        Assert.Contains("RUN dotnet publish Gateway.cs -c Release -o /app/publish", dockerfile);
-        Assert.Contains("FROM mcr.microsoft.com/dotnet/aspnet:11.0.0-rc.1", dockerfile);
-        Assert.Contains("COPY --from=build /app/publish .", dockerfile);
-        Assert.Contains("ENTRYPOINT [\"dotnet\",\"Gateway.dll\"]", dockerfile);
-        Assert.DoesNotContain(GatewayPackageId, dockerfile);
+        await Verify(dockerfile, extension: "Dockerfile");
 
         Assert.Empty(gateway.Resource.Annotations.OfType<ProjectLaunchArgsOverrideAnnotation>());
         Assert.Empty(gateway.Resource.Annotations.OfType<ExecutableAnnotation>());
     }
 
     [Fact]
-    public void BlazorWasmPublishCompanion_UsesNet11Sdk()
+    public async Task BlazorWasmPublishCompanion_UsesNet11Sdk()
     {
         var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
             "Blazor/Blazor.csproj",
             ".aspire/scripts/PrefixEndpoints.cs",
             "app");
 
-        Assert.StartsWith("FROM mcr.microsoft.com/dotnet/sdk:11.0.100-rc.1 AS build", dockerfile);
-        Assert.Contains("WORKDIR /src/Blazor", dockerfile);
-        Assert.Contains("RUN dotnet publish \"Blazor.csproj\" -c Release -o /app/publish", dockerfile);
-        Assert.Contains("dotnet run \"/src/.aspire/scripts/PrefixEndpoints.cs\"", dockerfile);
+        await Verify(dockerfile, extension: "Dockerfile");
+    }
+
+    [Theory]
+    [InlineData("net8.0")]
+    [InlineData("net10.0")]
+    [InlineData("net11.0")]
+    public void ValidateBlazorWasmPublishTargetFramework_AcceptsSupportedFrameworks(string targetFramework)
+    {
+        BlazorGatewayExtensions.ValidateBlazorWasmPublishTargetFramework(targetFramework);
+    }
+
+    [Theory]
+    [InlineData("net12.0")]
+    [InlineData("net10.0;net11.0")]
+    [InlineData("netstandard2.1")]
+    [InlineData("invalid")]
+    public void ValidateBlazorWasmPublishTargetFramework_RejectsUnsupportedFrameworks(string targetFramework)
+    {
+        Assert.Throws<NotSupportedException>(
+            () => BlazorGatewayExtensions.ValidateBlazorWasmPublishTargetFramework(targetFramework));
+    }
+
+    [Fact]
+    public async Task GetTargetFrameworkAsync_UsesReleaseConfiguration()
+    {
+        var directory = Directory.CreateTempSubdirectory();
+        try
+        {
+            var projectPath = Path.Combine(directory.FullName, "Client.csproj");
+            await File.WriteAllTextAsync(
+                projectPath,
+                """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <TargetFramework Condition="'$(Configuration)' == 'Debug'">net12.0</TargetFramework>
+                    <TargetFramework Condition="'$(Configuration)' == 'Release'">net11.0</TargetFramework>
+                  </PropertyGroup>
+                </Project>
+                """);
+
+            var targetFramework = await BlazorWasmAppBuilder.GetTargetFrameworkAsync(
+                projectPath,
+                NullLogger.Instance,
+                CancellationToken.None);
+
+            Assert.Equal("net11.0", targetFramework);
+        }
+        finally
+        {
+            directory.Delete(recursive: true);
+        }
     }
 
     [Fact]
@@ -149,7 +191,7 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public void GetSolutionRoot_WithoutSolution_UsesAppHostParent()
+    public void GetSolutionRoot_WithoutSolution_Throws()
     {
         var directory = Directory.CreateTempSubdirectory();
         try
@@ -158,7 +200,10 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
 
             var projectDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "Client")).FullName;
 
-            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
+            var exception = Assert.Throws<InvalidOperationException>(
+                () => BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
+
+            Assert.Contains("requires a .sln or .slnx file", exception.Message);
         }
         finally
         {
@@ -176,7 +221,10 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
             File.WriteAllText(Path.Combine(appHostDirectory, "AppHost.slnx"), "<Solution />");
             var projectDirectory = Directory.CreateDirectory(Path.Combine(directory.FullName, "Client")).FullName;
 
-            Assert.Equal(directory.FullName, BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
+            var exception = Assert.Throws<InvalidOperationException>(
+                () => BlazorGatewayExtensions.GetSolutionRoot(appHostDirectory, projectDirectory));
+
+            Assert.Contains("that also contains the client project", exception.Message);
         }
         finally
         {
@@ -210,5 +258,64 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         public string ProjectPath => "TestProject/TestProject.csproj";
 
         public LaunchSettings LaunchSettings { get; } = new();
+    }
+
+    internal static async Task AssertGatewayProcessLaunchPlanAsync(
+        IResource resource,
+        IDistributedApplicationBuilder builder,
+        IServiceProvider services)
+    {
+        var executionContext = new DistributedApplicationExecutionContext(
+            new DistributedApplicationExecutionContextOptions(DistributedApplicationOperation.Run)
+            {
+                Services = services
+            });
+        var executionConfiguration = await ExecutionConfigurationBuilder.Create(resource)
+            .WithArgumentsConfig()
+            .BuildAsync(executionContext, NullLogger.Instance, CancellationToken.None);
+
+        Assert.Null(executionConfiguration.Exception);
+
+        var plan = await ExecutableCreator.ResolveLaunchPlanAsync(
+            resource,
+            executionConfiguration,
+            builder.Configuration,
+            new DistributedApplicationOptions(),
+            new ExecutableLaunchPolicy(builder.Configuration),
+            NullLogger.Instance,
+            CancellationToken.None);
+
+        Assert.Equal(ExecutableLaunchMechanism.Process, plan.Mechanism);
+        Assert.Equal("dotnet", plan.Command);
+        Assert.Equal(builder.AppHostDirectory, plan.WorkingDirectory);
+        Assert.Equal(
+            [
+                "tool",
+                "exec",
+                GatewayPackageId,
+                "--version",
+                GatewayPackageVersion,
+                "--yes",
+                "--",
+                "--environment",
+                builder.Environment.EnvironmentName,
+                "--Logging:LogLevel:Microsoft=Warning",
+                "--Logging:LogLevel:Microsoft.Hosting.Lifetime=Information",
+                "--Logging:LogLevel:System.Net.Http.HttpClient.OtlpExporter=Warning"
+            ],
+            plan.Arguments);
+
+        var executable = Executable.Create("gateway-12345678", "stale");
+        var renderedResource = new RenderedModelResource<Executable>(resource, executable);
+        ExecutableCreator.Render(
+            renderedResource,
+            plan,
+            pemCertificates: null,
+            NullLogger<ExecutableCreator>.Instance);
+
+        Assert.Equal(ExecutionType.Process, executable.Spec.ExecutionType);
+        Assert.Equal("dotnet", executable.Spec.ExecutablePath);
+        Assert.Equal(builder.AppHostDirectory, executable.Spec.WorkingDirectory);
+        Assert.Equal(plan.Arguments, executable.Spec.Args);
     }
 }

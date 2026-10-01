@@ -25,11 +25,11 @@ internal static class EndpointsManifestTransformer
             ManifestJsonContext.Default.EndpointsManifest)
             ?? throw new InvalidOperationException($"Failed to deserialize endpoints manifest from '{manifestPath}'.");
 
-        // .NET 11 can generate SPA fallback endpoints when StaticWebAssetSpaFallbackEnabled is set.
-        // Replace SDK-generated or previously transformed fallbacks so the gateway has one identity
-        // fallback with the route shape and content-encoding behavior expected by this integration.
+        // The .NET 11 manifest doesn't identify SPA fallbacks with endpoint metadata. Recognize the
+        // SDK/legacy shape by combining the nonfile catch-all route with an index.html asset, then
+        // replace every encoded variant with one prefixed identity fallback.
         manifest.Endpoints = manifest.Endpoints
-            .Where(endpoint => endpoint.Route is not ("{**fallback:nonfile}" or "{**path:nonfile}"))
+            .Where(endpoint => !IsSpaFallbackEndpoint(endpoint))
             .ToArray();
 
         var fallbackEndpoints = new List<EndpointEntry>();
@@ -51,6 +51,8 @@ internal static class EndpointsManifestTransformer
                     // Deep-clone via round-trip serialization, then patch route and cache header
                     var fallbackJson = JsonSerializer.Serialize(ep, ManifestJsonContext.Relaxed.EndpointEntry);
                     var fallback = JsonSerializer.Deserialize(fallbackJson, ManifestJsonContext.Default.EndpointEntry)!;
+                    // Use the SDK's canonical parameter name. The name itself is not semantically
+                    // significant, but matching the SDK avoids generating a second fallback shape.
                     fallback.Route = "{**fallback:nonfile}";
                     // The official gateway maps configuration and proxy endpoints alongside static assets.
                     // Keep the SPA fallback last so those endpoints handle matching requests first.
@@ -76,6 +78,13 @@ internal static class EndpointsManifestTransformer
         manifest.Endpoints = [.. manifest.Endpoints, .. fallbackEndpoints];
 
         return JsonSerializer.Serialize(manifest, ManifestJsonContext.Relaxed.EndpointsManifest);
+    }
+
+    private static bool IsSpaFallbackEndpoint(EndpointEntry endpoint)
+    {
+        return endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
+            && endpoint.Route.EndsWith(":nonfile}", StringComparison.Ordinal)
+            && Path.GetFileName(endpoint.AssetFile).StartsWith("index.html", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>

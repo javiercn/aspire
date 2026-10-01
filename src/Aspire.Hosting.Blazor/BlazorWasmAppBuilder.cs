@@ -109,4 +109,61 @@ internal static class BlazorWasmAppBuilder
         return (endpoints, runtime);
     }
 
+    public static async Task<string?> GetTargetFrameworkAsync(
+        string projectPath,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        var result = await BlazorDotNetCliRunner.RunAsync(
+            projectPath,
+            "msbuild",
+            [
+                "-property:Configuration=Release",
+                "-getProperty:TargetFramework",
+                "-getProperty:TargetFrameworks",
+                "-nologo"
+            ],
+            machineReadableOutput: true,
+            cancellationToken).ConfigureAwait(false);
+
+        if (!result.Started)
+        {
+            BlazorGatewayLog.ProcessStartFailed(
+                logger,
+                result.Command,
+                projectPath,
+                result.StartException?.Message ?? "Process.Start returned null.");
+            return null;
+        }
+
+        if (result.ExitCode != 0)
+        {
+            BlazorGatewayLog.MsBuildTargetFailed(logger, projectPath, result.StandardOutput, result.StandardError);
+            return null;
+        }
+
+        MSBuildPropertiesOutput? output;
+        try
+        {
+            output = JsonSerializer.Deserialize(result.StandardOutput.Trim(), ManifestJsonContext.Default.MSBuildPropertiesOutput);
+        }
+        catch (JsonException ex)
+        {
+            BlazorGatewayLog.ManifestJsonParseFailed(logger, projectPath, ex);
+            return null;
+        }
+
+        var properties = output?.Properties;
+        if (!string.IsNullOrEmpty(properties?.TargetFramework))
+        {
+            return properties.TargetFramework;
+        }
+
+        var targetFrameworks = properties?.TargetFrameworks
+            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        return targetFrameworks?.Length == 1
+            ? targetFrameworks[0]
+            : properties?.TargetFrameworks;
+    }
+
 }

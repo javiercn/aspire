@@ -34,7 +34,7 @@ var manifest = JsonSerializer.Deserialize(
     ManifestJsonContext.Default.EndpointsManifest)!;
 
 manifest.Endpoints = manifest.Endpoints
-    .Where(endpoint => endpoint.Route is not ("{**fallback:nonfile}" or "{**path:nonfile}"))
+    .Where(endpoint => !IsSpaFallbackEndpoint(endpoint))
     .ToArray();
 
 var fallbackEndpoints = new List<EndpointEntry>();
@@ -87,6 +87,15 @@ if (dir is not null)
 File.WriteAllText(outputPath, JsonSerializer.Serialize(manifest, ManifestJsonContext.Relaxed.EndpointsManifest));
 
 return 0;
+
+static bool IsSpaFallbackEndpoint(EndpointEntry endpoint)
+{
+    // .NET 11 doesn't add explicit fallback metadata, so recognize the SDK/legacy shape by
+    // combining the nonfile catch-all route with an index.html asset.
+    return endpoint.Route.StartsWith("{**", StringComparison.Ordinal)
+        && endpoint.Route.EndsWith(":nonfile}", StringComparison.Ordinal)
+        && Path.GetFileName(endpoint.AssetFile).StartsWith("index.html", StringComparison.OrdinalIgnoreCase);
+}
 
 // Same typed model used by the Hosting library's EndpointsManifestTransformer
 class EndpointsManifest
