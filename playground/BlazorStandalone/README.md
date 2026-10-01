@@ -2,7 +2,7 @@
 
 This sample demonstrates how to integrate a **standalone Blazor WebAssembly** application with Aspire, enabling full observability (logs, traces) and service discovery without requiring a hosted Blazor Server backend.
 
-During local development, the gateway runs from the official .NET tool and requires the .NET 11 RC1 SDK or later. The sample workloads target .NET 11, and the standalone client enables the SDK's `StaticWebAssetSpaFallbackEnabled` fallback generation. Publishing continues to use the generated file-based gateway.
+During local development, the gateway runs from the official .NET tool and requires the .NET 11 SDK or later. The sample workloads target .NET 11, and the standalone client enables the SDK's `StaticWebAssetSpaFallbackEnabled` fallback generation. Publishing continues to use the generated file-based gateway.
 
 ## Overview
 

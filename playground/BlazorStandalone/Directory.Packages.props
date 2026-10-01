@@ -1,7 +1,7 @@
 <Project>
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Packages.props', '$(MSBuildThisFileDirectory)../'))" />
 
-  <!-- Pin the .NET 11 RC1 packages that provide the SDK-generated SPA fallback contract. -->
+  <!-- Pin the .NET 11 packages that provide the SDK-generated SPA fallback contract. -->
   <ItemGroup>
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="$(MicrosoftAspNetCoreComponentsWebAssemblyNet11Version)" />
     <PackageVersion Update="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
