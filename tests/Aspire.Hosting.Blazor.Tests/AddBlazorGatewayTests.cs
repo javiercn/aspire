@@ -1,9 +1,13 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Net;
+using System.Text.Json;
 using Aspire.Hosting.ApplicationModel;
 using Aspire.Hosting.Dcp;
 using Aspire.Hosting.Dcp.Model;
+using Aspire.Hosting.Publishing;
+using Aspire.Hosting.Testing;
 using Aspire.Hosting.Tests.Utils;
 using Aspire.Hosting.Utils;
 using Aspire.TestUtilities;
@@ -12,6 +16,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 #pragma warning disable ASPIREDOCKERFILEBUILDER001 // DockerfileBuilder is experimental
 #pragma warning disable ASPIREPROJECTS001 // ProjectLaunchArgsOverrideAnnotation is experimental
+#pragma warning disable ASPIRECONTAINERRUNTIME001 // Container image build and cleanup are experimental
+#pragma warning disable ASPIREPIPELINES003 // Container image manager is experimental
 
 namespace Aspire.Hosting.Blazor.Tests;
 
@@ -159,29 +165,10 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         using var fileSystem = new TestFileSystemService();
         using var directory = fileSystem.TempDirectory.CreateTempSubdirectory();
         var clientDirectory = Path.Combine(directory.Path, "Client");
-        Directory.CreateDirectory(Path.Combine(clientDirectory, "wwwroot"));
+        await WriteClientProjectAsync(clientDirectory);
         await File.WriteAllTextAsync(Path.Combine(clientDirectory, "global.json"),
             """{"sdk":{"version":"10.0.201","rollForward":"latestFeature"}}""");
         File.Copy(Path.Combine(clientDirectory, "global.json"), Path.Combine(directory.Path, "global.json"));
-        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Client.csproj"),
-            """
-            <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
-              <PropertyGroup>
-                <TargetFrameworks>net10.0</TargetFrameworks>
-                <RestoreSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json</RestoreSources>
-              </PropertyGroup>
-              <ItemGroup>
-                <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
-              </ItemGroup>
-            </Project>
-            """);
-        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Program.cs"),
-            """
-            using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-            await WebAssemblyHostBuilder.CreateDefault(args).Build().RunAsync();
-            """);
-        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "wwwroot", "index.html"),
-            """<!DOCTYPE html><html><head><base href="/" /></head><body><script src="_framework/blazor.webassembly.js"></script></body></html>""");
         var script = await File.ReadAllTextAsync(
             Path.Combine(Path.GetDirectoryName(typeof(BlazorGatewayExtensions).Assembly.Location)!, "Scripts", "PrefixEndpoints.cs"));
         await File.WriteAllTextAsync(Path.Combine(directory.Path, "PrefixEndpoints.cs"),
@@ -207,6 +194,161 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         await app.StartAsync(timeout.Token);
         await app.ResourceNotifications.WaitForResourceAsync("client-publish", KnownResourceStates.Running, timeout.Token);
         await app.StopAsync(TestContext.Current.CancellationToken);
+    }
+
+    [Fact]
+    [OuterloopTest("Builds and runs the published client companion and gateway images")]
+    [RequiresFeature(TestFeature.ContainerRuntime | TestFeature.ContainerImageBuild)]
+    public async Task PublishedBlazorGateway_ServesSpaConfigurationAndApi()
+    {
+        using var fileSystem = new TestFileSystemService();
+        using var directory = fileSystem.TempDirectory.CreateTempSubdirectory();
+        var clientDirectory = Path.Combine(directory.Path, "Client");
+        await WriteClientProjectAsync(clientDirectory);
+        await File.WriteAllTextAsync(Path.Combine(directory.Path, "Test.slnx"), "<Solution />");
+        using var publishBuilder = TestDistributedApplicationBuilder.Create(
+            options => options.ProjectDirectory = directory.Path, testOutputHelper, "AppHost:Operation=publish");
+        var backendAlias = $"weatherapi-{Guid.NewGuid():N}";
+        var backend = publishBuilder.AddProject<TestProjectMetadata>("weatherapi")
+            .WithHttpEndpoint(targetPort: 80);
+        var backendEndpoint = backend.Resource.Annotations.OfType<EndpointAnnotation>().Single();
+        backendEndpoint.AllocatedEndpoint = new AllocatedEndpoint(backendEndpoint, backendAlias, 80);
+        var client = publishBuilder.AddBlazorWasmApp("app", Path.Combine(clientDirectory, "Client.csproj"))
+            .WithReference(backend);
+        var gateway = publishBuilder.AddBlazorGateway("gateway")
+            .WithBlazorClientApp(client, proxyTelemetry: false);
+        gateway.Resource.Annotations.Remove(gateway.Resource.Annotations.OfType<EndpointAnnotation>().Single(endpoint => endpoint.Name == "https"));
+
+        var gatewayContainer = publishBuilder.Resources.OfType<ContainerResource>().Single(resource => resource.Name == "gateway");
+        var companion = Assert.Single(gateway.Resource.Annotations.OfType<ContainerFilesDestinationAnnotation>()).Source;
+        var gatewayBuild = Assert.Single(gatewayContainer.Annotations.OfType<DockerfileBuildAnnotation>());
+        var gatewayDirectory = Directory.CreateDirectory(Path.Combine(directory.Path, "Gateway")).FullName;
+        const string restoreDirective = "#:property RestoreSources=https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json\n";
+        await File.WriteAllTextAsync(Path.Combine(gatewayDirectory, "Gateway.cs"),
+            restoreDirective + await File.ReadAllTextAsync(Path.Combine(gatewayBuild.ContextPath, "Gateway.cs")));
+        gatewayContainer.Annotations.Remove(gatewayBuild);
+        gatewayContainer.Annotations.Add(new DockerfileBuildAnnotation(gatewayDirectory, Path.Combine(gatewayDirectory, "Dockerfile"), stage: null)
+        {
+            DockerfileFactory = gatewayBuild.DockerfileFactory,
+            ImageName = gatewayBuild.ImageName,
+            ImageTag = gatewayBuild.ImageTag
+        });
+        var prefixScriptPath = Path.Combine(directory.Path, ".aspire", "scripts", "PrefixEndpoints.cs");
+        await File.WriteAllTextAsync(prefixScriptPath, restoreDirective + await File.ReadAllTextAsync(prefixScriptPath));
+
+        using var publishApp = publishBuilder.Build();
+        var imageBuilder = publishApp.Services.GetRequiredService<IResourceContainerImageManager>();
+        var runtime = await publishApp.Services.GetRequiredService<IContainerRuntimeResolver>().ResolveAsync(TestContext.Current.CancellationToken);
+        Assert.True(companion.TryGetContainerImageName(out var clientImage));
+        Assert.True(gatewayContainer.TryGetContainerImageName(out var gatewayImage));
+        var builtImages = new List<string>();
+        try
+        {
+            using var buildTimeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+            buildTimeout.CancelAfter(TimeSpan.FromMinutes(10));
+            await imageBuilder.BuildImageAsync(companion, buildTimeout.Token);
+            builtImages.Add(clientImage);
+            await imageBuilder.BuildImageAsync(gatewayContainer, buildTimeout.Token);
+            builtImages.Add(gatewayImage);
+
+            using var builder = TestDistributedApplicationBuilder.Create(testOutputHelper);
+            var api = builder.AddContainer("weatherapi", "nginx", "alpine")
+                .WithContainerNetworkAlias(backendAlias)
+                .WithHttpEndpoint(targetPort: 80)
+                .WithContainerFiles("/usr/share/nginx/html", [
+                    new ContainerFile { Name = "forecast.json", Contents = """{"temperatureC":21}""" }
+                ])
+                .WithHttpHealthCheck("/forecast.json");
+            builder.AddContainer("gateway", gatewayImage)
+                .WithHttpEndpoint(targetPort: 8080)
+                .WithHttpHealthCheck("/app/")
+                .WaitFor(api)
+                .WithEnvironment(async context =>
+                {
+                    var endpoint = gateway.Resource.Annotations.OfType<EndpointAnnotation>().Single();
+                    endpoint.AllocatedEndpoint = context.Resource.Annotations.OfType<EndpointAnnotation>().Single().AllocatedEndpoint;
+                    var configuration = await ExecutionConfigurationBuilder.Create(gatewayContainer)
+                        .WithEnvironmentVariablesConfig()
+                        .BuildAsync(publishBuilder.ExecutionContext, cancellationToken: context.CancellationToken);
+                    if (configuration.Exception is not null)
+                    {
+                        throw configuration.Exception;
+                    }
+
+                    foreach (var (key, value) in configuration.EnvironmentVariablesWithUnprocessed)
+                    {
+                        context.EnvironmentVariables[key] = value.Unprocessed;
+                    }
+                });
+            using var app = builder.Build();
+            try
+            {
+                using var startupTimeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+                startupTimeout.CancelAfter(TimeSpan.FromMinutes(2));
+                await app.StartAsync(startupTimeout.Token);
+                await app.ResourceNotifications.WaitForResourceHealthyAsync("gateway", startupTimeout.Token);
+
+                using var httpClient = app.CreateHttpClient("gateway", "http");
+                using var requestTimeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+                requestTimeout.CancelAfter(TimeSpan.FromSeconds(30));
+                var index = await httpClient.GetStringAsync("/app/", requestTimeout.Token);
+                Assert.Contains("blazor.webassembly.js", index);
+                Assert.Equal(index, await httpClient.GetStringAsync("/app/weather/today", requestTimeout.Token));
+                using var bootScript = await httpClient.GetAsync("/app/_framework/blazor.webassembly.js", requestTimeout.Token);
+                bootScript.EnsureSuccessStatusCode();
+                using var missingAsset = await httpClient.GetAsync("/app/missing.js", requestTimeout.Token);
+                Assert.Equal(HttpStatusCode.NotFound, missingAsset.StatusCode);
+                using var configurationResponse = await httpClient.GetAsync("/app/_blazor/_configuration", requestTimeout.Token);
+                configurationResponse.EnsureSuccessStatusCode();
+                Assert.Equal("application/json", configurationResponse.Content.Headers.ContentType?.MediaType);
+                using var configuration = JsonDocument.Parse(await configurationResponse.Content.ReadAsStringAsync(requestTimeout.Token));
+                Assert.Equal(
+                    new Uri(httpClient.BaseAddress!, "/app/_api/weatherapi").AbsoluteUri,
+                    configuration.RootElement.GetProperty("webAssembly").GetProperty("environment")
+                        .GetProperty("services__weatherapi__http__0").GetString());
+                using var apiResponse = await httpClient.GetAsync("/app/_api/weatherapi/forecast.json", requestTimeout.Token);
+                apiResponse.EnsureSuccessStatusCode();
+                using var forecast = JsonDocument.Parse(await apiResponse.Content.ReadAsStringAsync(requestTimeout.Token));
+                Assert.Equal(21, forecast.RootElement.GetProperty("temperatureC").GetInt32());
+                using var missingApi = await httpClient.GetAsync("/app/_api/weatherapi/missing.json", requestTimeout.Token);
+                Assert.Equal(HttpStatusCode.NotFound, missingApi.StatusCode);
+            }
+            finally
+            {
+                await app.StopAsync(CancellationToken.None);
+            }
+        }
+        finally
+        {
+            foreach (var image in builtImages.AsEnumerable().Reverse())
+            {
+                await runtime.RemoveImageAsync(image, CancellationToken.None);
+            }
+        }
+    }
+
+    private static async Task WriteClientProjectAsync(string clientDirectory)
+    {
+        Directory.CreateDirectory(Path.Combine(clientDirectory, "wwwroot"));
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Client.csproj"),
+            """
+            <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+              <PropertyGroup>
+                <TargetFrameworks>net10.0</TargetFrameworks>
+                <RestoreSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json</RestoreSources>
+              </PropertyGroup>
+              <ItemGroup>
+                <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+              </ItemGroup>
+            </Project>
+            """);
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Program.cs"),
+            """
+            using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+            await WebAssemblyHostBuilder.CreateDefault(args).Build().RunAsync();
+            """);
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "wwwroot", "index.html"),
+            """<!DOCTYPE html><html><head><base href="/" /></head><body><script src="_framework/blazor.webassembly.js"></script></body></html>""");
     }
 
     [Theory]
