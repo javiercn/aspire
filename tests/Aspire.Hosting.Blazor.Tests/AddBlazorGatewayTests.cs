@@ -126,7 +126,10 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
             "11.0.100-rc.1.26425.128",
             "net11.0");
 
-        await Verify(dockerfile, extension: "Dockerfile");
+        await Verify(dockerfile, extension: "Dockerfile")
+            .AddScrubber(content => content
+                .Replace("/tmp/", "{TempPath}")
+                .Replace("WORKDIR /tmp", "WORKDIR {TempPath}"));
     }
 
     [Theory]
