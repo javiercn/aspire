@@ -6,6 +6,7 @@ using Aspire.Hosting.Dcp;
 using Aspire.Hosting.Dcp.Model;
 using Aspire.Hosting.Tests.Utils;
 using Aspire.Hosting.Utils;
+using Aspire.TestUtilities;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -115,9 +116,97 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
         var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
             "Blazor/Blazor.csproj",
             ".aspire/scripts/PrefixEndpoints.cs",
-            "app");
+            "app",
+            "11.0.100-rc.1.26425.128",
+            "net11.0");
 
         await Verify(dockerfile, extension: "Dockerfile");
+    }
+
+    [Theory]
+    [InlineData("8.0.408", "net8.0")]
+    [InlineData("9.0.203", "net9.0")]
+    [InlineData("10.0.201", "net10.0")]
+    [InlineData("11.0.100-rc.1.26425.128", "net11.0")]
+    public void BlazorWasmPublishCompanion_InstallsClientSdkAlongsideGatewaySdk(string sdkVersion, string framework)
+    {
+        var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
+            "Client/Client.csproj", ".aspire/scripts/PrefixEndpoints.cs", "app", sdkVersion, framework);
+
+        Assert.Contains($"--version {sdkVersion} --install-dir /opt/client-dotnet --no-path", dockerfile);
+        Assert.Contains($"/opt/client-dotnet/dotnet publish \"Client.csproj\" -f {framework}", dockerfile);
+        Assert.Contains("WORKDIR /tmp", dockerfile);
+        Assert.Contains("cp \"/src/.aspire/scripts/PrefixEndpoints.cs\" /tmp/PrefixEndpoints.cs", dockerfile);
+        Assert.Contains("dotnet run /tmp/PrefixEndpoints.cs", dockerfile);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("7.0.410")]
+    [InlineData("12.0.100")]
+    [InlineData("10.0.201;echo")]
+    public void BlazorWasmPublishCompanion_RejectsUnsupportedSdk(string sdkVersion)
+    {
+        Assert.Throws<NotSupportedException>(() => BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
+            "Client/Client.csproj", ".aspire/scripts/PrefixEndpoints.cs", "app", sdkVersion, "net10.0"));
+    }
+
+    [Fact]
+    [OuterloopTest("Builds the generated publish image and downloads the pinned client SDK")]
+    [RequiresFeature(TestFeature.ContainerRuntime | TestFeature.ContainerImageBuild)]
+    public async Task BlazorWasmPublishCompanion_BuildsClientPinnedToOlderSdk()
+    {
+        using var fileSystem = new TestFileSystemService();
+        using var directory = fileSystem.TempDirectory.CreateTempSubdirectory();
+        var clientDirectory = Path.Combine(directory.Path, "Client");
+        Directory.CreateDirectory(Path.Combine(clientDirectory, "wwwroot"));
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "global.json"),
+            """{"sdk":{"version":"10.0.201","rollForward":"latestFeature"}}""");
+        File.Copy(Path.Combine(clientDirectory, "global.json"), Path.Combine(directory.Path, "global.json"));
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Client.csproj"),
+            """
+            <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+              <PropertyGroup>
+                <TargetFrameworks>net10.0</TargetFrameworks>
+                <RestoreSources>https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json</RestoreSources>
+              </PropertyGroup>
+              <ItemGroup>
+                <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.0" />
+              </ItemGroup>
+            </Project>
+            """);
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "Program.cs"),
+            """
+            using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+            await WebAssemblyHostBuilder.CreateDefault(args).Build().RunAsync();
+            """);
+        await File.WriteAllTextAsync(Path.Combine(clientDirectory, "wwwroot", "index.html"),
+            """<!DOCTYPE html><html><head><base href="/" /></head><body><script src="_framework/blazor.webassembly.js"></script></body></html>""");
+        var script = await File.ReadAllTextAsync(
+            Path.Combine(Path.GetDirectoryName(typeof(BlazorGatewayExtensions).Assembly.Location)!, "Scripts", "PrefixEndpoints.cs"));
+        await File.WriteAllTextAsync(Path.Combine(directory.Path, "PrefixEndpoints.cs"),
+            "#:property RestoreSources=https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-public/nuget/v3/index.json\n" + script);
+
+        var dockerfile = BlazorGatewayExtensions.BuildBlazorWasmPublishDockerfile(
+            "Client/Client.csproj", "PrefixEndpoints.cs", "app", "10.0.201", "net10.0");
+        dockerfile += """
+
+            RUN test -f /app/output/wwwroot/app/index.html && \
+                test -s /app/output/app.endpoints.json && \
+                cd /src/Client && /opt/client-dotnet/dotnet --version | grep -Fx 10.0.201 && \
+                cd /tmp && dotnet --version | grep '^11\.'
+            CMD ["sleep", "infinity"]
+            """;
+        await File.WriteAllTextAsync(Path.Combine(directory.Path, "Dockerfile"), dockerfile);
+
+        using var builder = TestDistributedApplicationBuilder.Create(testOutputHelper);
+        builder.AddDockerfile("client-publish", directory.Path);
+        using var app = builder.Build();
+        using var timeout = CancellationTokenSource.CreateLinkedTokenSource(TestContext.Current.CancellationToken);
+        timeout.CancelAfter(TimeSpan.FromMinutes(10));
+        await app.StartAsync(timeout.Token);
+        await app.ResourceNotifications.WaitForResourceAsync("client-publish", KnownResourceStates.Running, timeout.Token);
+        await app.StopAsync(TestContext.Current.CancellationToken);
     }
 
     [Theory]
@@ -141,7 +230,7 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
     }
 
     [Fact]
-    public async Task GetTargetFrameworkAsync_UsesReleaseConfiguration()
+    public async Task GetPublishPropertiesAsync_UsesReleaseConfiguration()
     {
         var directory = Directory.CreateTempSubdirectory();
         try
@@ -158,17 +247,38 @@ public class AddBlazorGatewayTests(ITestOutputHelper testOutputHelper)
                 </Project>
                 """);
 
-            var targetFramework = await BlazorWasmAppBuilder.GetTargetFrameworkAsync(
+            var properties = await BlazorWasmAppBuilder.GetPublishPropertiesAsync(
                 projectPath,
                 NullLogger.Instance,
                 CancellationToken.None);
 
-            Assert.Equal("net11.0", targetFramework);
+            Assert.NotNull(properties);
+            Assert.Equal("net11.0", properties.TargetFramework);
         }
         finally
         {
             directory.Delete(recursive: true);
         }
+    }
+
+    [Theory]
+    [InlineData("net11.0", "net11.0")]
+    [InlineData(" ; net11.0 ; ; ", "net11.0")]
+    [InlineData("net10.0;net11.0", "net10.0;net11.0")]
+    public async Task GetPublishPropertiesAsync_NormalizesSingleEntryTargetFrameworksAndResolvesSdk(string targetFrameworks, string expectedFramework)
+    {
+        using var fileSystem = new TestFileSystemService();
+        using var directory = fileSystem.TempDirectory.CreateTempSubdirectory();
+        var projectPath = Path.Combine(directory.Path, "Client.csproj");
+        await File.WriteAllTextAsync(projectPath,
+            $"""<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><TargetFrameworks>{targetFrameworks}</TargetFrameworks></PropertyGroup></Project>""");
+
+        var properties = await BlazorWasmAppBuilder.GetPublishPropertiesAsync(
+            projectPath, NullLogger.Instance, TestContext.Current.CancellationToken);
+
+        Assert.NotNull(properties);
+        Assert.Equal(expectedFramework, properties.TargetFramework);
+        Assert.NotEmpty(properties.NETCoreSdkVersion);
     }
 
     [Fact]

@@ -109,7 +109,7 @@ internal static class BlazorWasmAppBuilder
         return (endpoints, runtime);
     }
 
-    public static async Task<string?> GetTargetFrameworkAsync(
+    public static async Task<MSBuildManifestProperties?> GetPublishPropertiesAsync(
         string projectPath,
         ILogger logger,
         CancellationToken cancellationToken)
@@ -121,6 +121,7 @@ internal static class BlazorWasmAppBuilder
                 "-property:Configuration=Release",
                 "-getProperty:TargetFramework",
                 "-getProperty:TargetFrameworks",
+                "-getProperty:NETCoreSdkVersion",
                 "-nologo"
             ],
             machineReadableOutput: true,
@@ -154,16 +155,16 @@ internal static class BlazorWasmAppBuilder
         }
 
         var properties = output?.Properties;
-        if (!string.IsNullOrEmpty(properties?.TargetFramework))
+        if (properties is not null && string.IsNullOrEmpty(properties.TargetFramework))
         {
-            return properties.TargetFramework;
+            var targetFrameworks = properties.TargetFrameworks
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            properties.TargetFramework = targetFrameworks.Length == 1
+                ? targetFrameworks[0]
+                : properties.TargetFrameworks;
         }
 
-        var targetFrameworks = properties?.TargetFrameworks
-            .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        return targetFrameworks?.Length == 1
-            ? targetFrameworks[0]
-            : properties?.TargetFrameworks;
+        return properties;
     }
 
 }

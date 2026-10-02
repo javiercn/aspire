@@ -39,7 +39,8 @@ public static class BlazorGatewayExtensions
     /// <remarks>
     /// Development requires a .NET SDK compatible with the configured gateway tool package.
     /// When publishing attached Blazor WebAssembly apps, each client must target a single framework
-    /// supported by the SDK image used by this package. The AppHost and client projects must also
+    /// supported by this package. The client's selected SDK must be available locally and is
+    /// installed in the build image. The AppHost and client projects must also
     /// be contained by a common ancestor directory with a <c>.sln</c> or <c>.slnx</c> file; that
     /// directory is used as the Docker build context.
     /// </remarks>
@@ -643,14 +644,12 @@ public static class BlazorGatewayExtensions
             ILogger logger = context.Services.GetService<ILogger<BlazorWasmAppResource>>() is { } typedLogger
                 ? typedLogger
                 : Microsoft.Extensions.Logging.Abstractions.NullLogger.Instance;
-            var targetFramework = await BlazorWasmAppBuilder.GetTargetFrameworkAsync(
+            var properties = await BlazorWasmAppBuilder.GetPublishPropertiesAsync(
                 wasmApp.Resource.ProjectPath,
                 logger,
                 context.CancellationToken).ConfigureAwait(false)
-                ?? throw new InvalidOperationException($"Unable to determine the target framework for '{wasmApp.Resource.ProjectPath}'.");
-
-            ValidateBlazorWasmPublishTargetFramework(targetFramework);
-            return BuildBlazorWasmPublishDockerfile(relativeProjectPath, scriptRelativePath, pathPrefix);
+                ?? throw new InvalidOperationException($"Unable to determine publish properties for '{wasmApp.Resource.ProjectPath}'.");
+            return BuildBlazorWasmPublishDockerfile(relativeProjectPath, scriptRelativePath, pathPrefix, properties.NETCoreSdkVersion, properties.TargetFramework);
         });
 
         gateway.WithAnnotation(new ContainerFilesDestinationAnnotation
@@ -663,8 +662,19 @@ public static class BlazorGatewayExtensions
     internal static string BuildBlazorWasmPublishDockerfile(
         string relativeProjectPath,
         string scriptRelativePath,
-        string pathPrefix)
+        string pathPrefix,
+        string clientSdkVersion,
+        string targetFramework)
     {
+        var numericVersion = clientSdkVersion.Split('-', 2)[0];
+        if (!Version.TryParse(numericVersion, out var version)
+            || version.Major is < 8 or > 11
+            || clientSdkVersion.Any(character => !char.IsAsciiLetterOrDigit(character) && character is not '.' and not '-'))
+        {
+            throw new NotSupportedException($"Publishing a Blazor WebAssembly project with SDK '{clientSdkVersion}' is not supported. Use a .NET SDK from 8 through 11.");
+        }
+
+        ValidateBlazorWasmPublishTargetFramework(targetFramework);
         var projectDirectory = Path.GetDirectoryName(relativeProjectPath)?.Replace('\\', '/');
         var projectFileName = Path.GetFileName(relativeProjectPath);
         var containerProjectDirectory = string.IsNullOrEmpty(projectDirectory)
@@ -673,15 +683,20 @@ public static class BlazorGatewayExtensions
 
         return $$"""
             FROM {{DotNetSdkImageRepo}}:{{s_blazorSdkImageTag}} AS build
+            RUN curl --fail --show-error --location https://dot.net/v1/dotnet-install.sh -o /tmp/dotnet-install.sh && \
+                bash /tmp/dotnet-install.sh --version {{clientSdkVersion}} --install-dir /opt/client-dotnet --no-path && \
+                rm /tmp/dotnet-install.sh
             WORKDIR /src
             COPY . .
             WORKDIR {{containerProjectDirectory}}
-            RUN dotnet publish "{{projectFileName}}" -c Release -o /app/publish
+            RUN /opt/client-dotnet/dotnet publish "{{projectFileName}}" -f {{targetFramework}} -c Release -o /app/publish
 
             # Prefix asset paths and add SPA fallback endpoint
+            WORKDIR /tmp
             RUN mkdir -p /app/output/wwwroot/{{pathPrefix}} && \
                 cp -r /app/publish/wwwroot/* /app/output/wwwroot/{{pathPrefix}}/ && \
-                dotnet run "/src/{{scriptRelativePath}}" -- \
+                cp "/src/{{scriptRelativePath}}" /tmp/PrefixEndpoints.cs && \
+                dotnet run /tmp/PrefixEndpoints.cs -- \
                     /app/publish/*.staticwebassets.endpoints.json \
                     {{pathPrefix}} \
                     /app/output/{{pathPrefix}}.endpoints.json
@@ -705,6 +720,7 @@ public static class BlazorGatewayExtensions
         if (!targetFramework.StartsWith("net", StringComparison.OrdinalIgnoreCase)
             || majorText.IsEmpty
             || !int.TryParse(majorText, out var majorVersion)
+            || !Version.TryParse(targetFramework[3..], out _)
             || majorVersion > MaximumSupportedMajorVersion)
         {
             throw new NotSupportedException(
